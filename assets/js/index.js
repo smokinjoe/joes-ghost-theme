@@ -29,16 +29,14 @@
           scrolling: 'no'
         });
 
-    $iframe.appendTo($element);
-    $iframe.hide();
     $element.on('click', function (e) {
       e.preventDefault();
-      
-      if ($iframe.is('visible')) {
-        $iframe.hide();
+
+      if ($iframe.is(':visible')) {
+        $iframe.detach();
       }
       else {
-        $iframe.show();
+        $iframe.appendTo($element);
       }
     });
 
