@@ -6,17 +6,30 @@
 (function ($, undefined) {
     "use strict";
 
-    var $document = $(document);
+  var $document = $(document);
 
-    $document.ready(function () {
-        checkInlineMedia();
-        setArcticScroll();
-    });
+  $document.ready(function () {
+    checkInlineMedia();
+    setArcticScroll();
+  });
 
   var checkInlineMedia = function () {
     $('a[data-inline]').each(function () {
-      var $this = $(this);
+      var $this = $(this),
+          src = $this.data('src');
       buildiFrameWith($this);
+    });
+  };
+
+  var buildHTML5VideoWith = function ($element) {
+    var $video = $('<video>', {
+
+    });
+  };
+
+  var buildIMGwith = function ($element) {
+    var $img = $('<img>', {
+      
     });
   };
 
@@ -29,6 +42,8 @@
           scrolling: 'no'
         });
 
+    $iframe.attr('allowfullscreen');
+
     $element.on('click', function (e) {
       e.preventDefault();
 
@@ -39,7 +54,6 @@
         $iframe.appendTo($element);
       }
     });
-
   };
 
     // Arctic Scroll Source
