@@ -18,19 +18,35 @@
       var $this = $(this),
           src = $this.data('src');
       buildiFrameWith($this);
+
+      if (src.match(/streamable/)) {
+        buildiFrameWith($this);
+      }
+      else if (src.match(/.mv4/)) {
+        buildHTML5VideoWith($this);
+      }
+      else if (src.match(/gif/)) {
+        buildIMGwith($this);
+      }
     });
   };
 
   var buildHTML5VideoWith = function ($element) {
     var $video = $('<video>', {
+          src: $element.data('src'),
+          height: 450,
+          width: 600
+        });
 
-    });
+    console.log("buildHTML5VideoWith");
   };
 
   var buildIMGwith = function ($element) {
     var $img = $('<img>', {
-      
-    });
+          src: $element.dat('src'),
+          height: 450,
+          width: 600
+        });
   };
 
   var buildiFrameWith = function ($element) {
