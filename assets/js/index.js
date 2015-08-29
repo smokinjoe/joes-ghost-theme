@@ -17,10 +17,9 @@
     $('a[data-inline]').each(function () {
       var $this = $(this),
           src = $this.data('src');
-      buildiFrameWith($this);
 
       if (src.match(/streamable/)) {
-        buildiFrameWith($this);
+        handleStreamableMedia($this);
       }
       else if (src.match(/.mv4/)) {
         buildHTML5VideoWith($this);
@@ -28,6 +27,20 @@
       else if (src.match(/gif/)) {
         buildIMGwith($this);
       }
+    });
+  };
+
+  var handleStreamableMedia = function ($element) {
+    var uriArray = $element.data('src').split('/'),
+        streamableId = uriArray[uriArray.length - 1],
+        src = '//streamable/res/' + streamableId;
+
+    buildiFrame({
+      el: $element,
+      src: src,
+      height: 450,
+      width: 600,
+      scrolling: 'no'
     });
   };
 
@@ -49,6 +62,38 @@
         });
   };
 
+  var buildiFrame = function (opts) {
+    opts = opts || {}
+    var src = opts.src,
+        height = opts.height || 450,
+        width = opts.width || 600,
+        scrolling = opts.scrolling || 'no',
+        $element = opts.$element || $('<div />'),
+        $iframe = $('<iframe>', {
+          src: src,
+          frameboarder: 0,
+          height: height,
+          width: width,
+          scrolling: scrolling
+        });;
+
+    // think about moving this to separate method
+    $element.on('click', function (e) {
+      debugger;
+      e.preventDefault();
+
+      if ($iframe.is(':visible')) {
+        $iframe.detach();
+      }
+      else {
+        $iframe.appendTo($element);
+      }
+    });
+
+  }
+
+
+  // deprecating this - currently not used
   var buildiFrameWith = function ($element) {
     var $iframe = $('<iframe>', {
           src: $element.data('src'),
