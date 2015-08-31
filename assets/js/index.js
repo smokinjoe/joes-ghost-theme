@@ -50,10 +50,12 @@
   var handleGfyCat = function ($element) {
     var uriArray = $element.data('src').split('/'),
         gfyCatDealie = uriArray[uriArray.length - 1],
-        src = '//gfycat.com/ifr/' + gfyCatDealie;
+        src = '//gfycat.com/' + gfyCatDealie;
 
-    // $element.data('src', src);
-    buildHTML5VideoWith($element);
+    buildHTML5Video({
+      $element: $element,
+      src: src
+    });
   };
 
   var buildHTML5Video = function (opts) {
@@ -67,6 +69,7 @@
           width: 600,
           loop: '',
           autoplay: '',
+          controls: '',
           muted: 'muted'
         }),
         $webmSource = $('<source>', {
