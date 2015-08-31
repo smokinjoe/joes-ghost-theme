@@ -21,8 +21,11 @@
       if (src.match(/streamable/)) {
         handleStreamableMedia($this);
       }
-      else if (src.match(/.mv4/)) {
+      else if (src.match(/mp4/)) {
         buildHTML5VideoWith($this);
+      }
+      else if (src.match(/gfycat/)) {
+        handleGfyCat($this);
       }
       else if (src.match(/gif/)) {
         buildIMGwith($this);
@@ -33,10 +36,10 @@
   var handleStreamableMedia = function ($element) {
     var uriArray = $element.data('src').split('/'),
         streamableId = uriArray[uriArray.length - 1],
-        src = '//streamable/res/' + streamableId;
+        src = '//streamable.com/res/' + streamableId;
 
     buildiFrame({
-      el: $element,
+      $element: $element,
       src: src,
       height: 450,
       width: 600,
@@ -44,14 +47,62 @@
     });
   };
 
+  var handleGfyCat = function ($element) {
+    var uriArray = $element.data('src').split('/'),
+        gfyCatDealie = uriArray[uriArray.length - 1],
+        src = '//gfycat.com/ifr/' + gfyCatDealie;
+
+    // $element.data('src', src);
+    buildHTML5VideoWith($element);
+  };
+
+  var buildHTML5Video = function (opts) {
+    opts = opts || {};
+    var height = opts.height || 450,
+        width = opts.width || 600,
+        $element = opts.$element || $('<div />'),
+        src = opts.src || $element.data('src'),
+        $video = $('<video>', {
+          height: 450,
+          width: 600,
+          loop: '',
+          autoplay: '',
+          muted: 'muted'
+        }),
+        $webmSource = $('<source>', {
+          src: src + '.webm',
+          type: 'video/webm'
+        }),
+        $mp4Source = $('<source>', {
+          src: src + '.mp4',
+          type: 'video/mp4'
+        });
+
+    $video.append($webmSource);
+    $video.append($mp4Source);
+
+//     <video id="gfyVid1" class="gfyVid" width="1280" height="720" autoplay="" loop="" muted="muted" poster="//thumbs.gfycat.com/CapitalAnimatedFinch-poster.jpg" style="display: block;">
+
+//             <source id="webmsource" src="//zippy.gfycat.com/CapitalAnimatedFinch.webm" type="video/webm">
+//             <source id="mp4source" src="//fat.gfycat.com/CapitalAnimatedFinch.mp4" type="video/mp4">
+//             Sorry, you don't have HTML5 video and we didn't catch this properly in javascript.
+//             You can try to view the gif directly: <a href="http://giant.gfycat.com/CapitalAnimatedFinch.gif">http://giant.gfycat.com/CapitalAnimatedFinch.gif</a>.
+//         </video>
+
+    handleClick($element, $video);
+    return $element;
+  };
+
+  // deprecate this shit
   var buildHTML5VideoWith = function ($element) {
     var $video = $('<video>', {
           src: $element.data('src'),
           height: 450,
-          width: 600
+          width: 600,
+          controls: true
         });
 
-    console.log("buildHTML5VideoWith");
+    handleClick($element, $video);
   };
 
   var buildIMGwith = function ($element) {
@@ -60,36 +111,41 @@
           height: 450,
           width: 600
         });
+
+    handleClick($element, $img);
   };
 
   var buildiFrame = function (opts) {
     opts = opts || {}
-    var src = opts.src,
-        height = opts.height || 450,
+    var height = opts.height || 450,
         width = opts.width || 600,
         scrolling = opts.scrolling || 'no',
         $element = opts.$element || $('<div />'),
+        src = opts.src || $element.data('src'),
         $iframe = $('<iframe>', {
           src: src,
           frameboarder: 0,
           height: height,
           width: width,
           scrolling: scrolling
-        });;
+        });
 
-    // think about moving this to separate method
-    $element.on('click', function (e) {
-      debugger;
+    handleClick($element, $iframe);
+
+    return $element;
+  }
+
+  var handleClick = function ($trigger, $ammo) {
+    $trigger.on('click', function (e) {
       e.preventDefault();
 
-      if ($iframe.is(':visible')) {
-        $iframe.detach();
+      if ($ammo.is(':visible')) {
+        $ammo.detach();
       }
       else {
-        $iframe.appendTo($element);
+        $ammo.appendTo($trigger);
       }
     });
-
   }
 
 
