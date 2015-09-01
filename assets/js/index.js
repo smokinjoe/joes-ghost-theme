@@ -40,9 +40,8 @@
 
     buildiFrame({
       $element: $element,
+      width: '100%',
       src: src,
-      height: 450,
-      width: 600,
       scrolling: 'no'
     });
   };
@@ -134,7 +133,7 @@
   var buildiFrame = function (opts) {
     opts = opts || {}
     var height = opts.height || 450,
-        width = opts.width || '100%',
+        width = opts.width || 710,
         scrolling = opts.scrolling || 'no',
         $element = opts.$element || $('<div />'),
         src = opts.src || $element.data('src'),
