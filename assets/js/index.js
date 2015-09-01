@@ -27,8 +27,14 @@
       else if (src.match(/gfycat/)) {
         handleGfyCat($this);
       }
+      else if (src.match(/gifv/)) {
+        handleImgur($this);
+      }
       else if (src.match(/gif/)) {
         buildIMGwith($this);
+      }
+      else if (src.match(jpg|jpeg|png)) {
+        buildIMGWith($this);
       }
     });
   };
@@ -61,15 +67,28 @@
     });
   };
 
+  var handleImgur = function ($element) {
+    var arr = $element.data('src').split('.');
+    arr.pop();
+    var src = arr.join('.'),
+        webmSrc = src + '.webm',
+        mp4Src = src + '.mp4';
+
+    buildHTML5Video({
+      $element: $element,
+      wrapChildSources: true,
+      webmSrc: webmSrc,
+      mp4Src: mp4Src
+    });
+
+  };
+
   var handleVidFile = function ($element) {
     buildHTML5Video({
       $element: $element
     });
   };
 
-  // JOE: I need to
-  //       - do something about the height/width
-  //       - something to disable $webmSource and $mp4Source
   var buildHTML5Video = function (opts) {
     opts = opts || {};
     var height = opts.height || 450,
@@ -108,21 +127,13 @@
       $video.attr('src', src);
     }
 
-//     <video id="gfyVid1" class="gfyVid" width="1280" height="720" autoplay="" loop="" muted="muted" poster="//thumbs.gfycat.com/CapitalAnimatedFinch-poster.jpg" style="display: block;">
-
-//             <source id="webmsource" src="//zippy.gfycat.com/CapitalAnimatedFinch.webm" type="video/webm">
-//             <source id="mp4source" src="//fat.gfycat.com/CapitalAnimatedFinch.mp4" type="video/mp4">
-//             Sorry, you don't have HTML5 video and we didn't catch this properly in javascript.
-//             You can try to view the gif directly: <a href="http://giant.gfycat.com/CapitalAnimatedFinch.gif">http://giant.gfycat.com/CapitalAnimatedFinch.gif</a>.
-//         </video>
-
     handleClick($element, $video);
     return $element;
   };
 
   var buildIMGwith = function ($element) {
     var $img = $('<img>', {
-          src: $element.dat('src'),
+          src: $element.data('src'),
           height: 450,
           width: 600
         });
