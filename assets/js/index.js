@@ -22,7 +22,7 @@
         handleStreamableMedia($this);
       }
       else if (src.match(/mp4/)) {
-        buildHTML5VideoWith($this);
+        handleVidFile($this);
       }
       else if (src.match(/gfycat/)) {
         handleGfyCat($this);
@@ -54,16 +54,27 @@
 
     buildHTML5Video({
       $element: $element,
-      src: src
+      src: src,
+      wrapChildSources: true
     });
   };
 
+  var handleVidFile = function ($element) {
+    buildHTML5Video({
+      $element: $element
+    });
+  };
+
+  // JOE: I need to
+  //       - do something about the height/width
+  //       - something to disable $webmSource and $mp4Source
   var buildHTML5Video = function (opts) {
     opts = opts || {};
     var height = opts.height || 450,
         width = opts.width || 600,
         $element = opts.$element || $('<div />'),
         src = opts.src || $element.data('src'),
+        wrapChildSources = opts.wrapChildSources || false,
         $video = $('<video>', {
           height: 450,
           width: 600,
@@ -72,17 +83,24 @@
           controls: '',
           muted: 'muted'
         }),
-        $webmSource = $('<source>', {
-          src: src + '.webm',
-          type: 'video/webm'
-        }),
-        $mp4Source = $('<source>', {
-          src: src + '.mp4',
-          type: 'video/mp4'
-        });
+        $webmSource, $mp4Source;
 
-    $video.append($webmSource);
-    $video.append($mp4Source);
+    if (wrapChildSources) {
+      $webmSource = $('<source>', {
+        src: src + '.webm',
+        type: 'video/webm'
+      });
+        $mp4Source = $('<source>', {
+        src: src + '.mp4',
+        type: 'video/mp4'
+      });
+
+      $video.append($webmSource);
+      $video.append($mp4Source);
+    }
+    else {
+      $video.attr('src', src);
+    }
 
 //     <video id="gfyVid1" class="gfyVid" width="1280" height="720" autoplay="" loop="" muted="muted" poster="//thumbs.gfycat.com/CapitalAnimatedFinch-poster.jpg" style="display: block;">
 
@@ -96,7 +114,7 @@
     return $element;
   };
 
-  // deprecate this shit
+  // JOE: deprecate this shit
   var buildHTML5VideoWith = function ($element) {
     var $video = $('<video>', {
           src: $element.data('src'),
