@@ -50,12 +50,15 @@
   var handleGfyCat = function ($element) {
     var uriArray = $element.data('src').split('/'),
         gfyCatDealie = uriArray[uriArray.length - 1],
-        src = '//gfycat.com/' + gfyCatDealie;
+        src = '//gfycat.com/' + gfyCatDealie,
+        webmSrc = '//zippy.gfycat.com/' + gfyCatDealie + '.webm',
+        mp4Src = '//fat.gfycat.com/' + gfyCatDealie + '.mp4';
 
     buildHTML5Video({
       $element: $element,
-      src: src,
-      wrapChildSources: true
+      wrapChildSources: true,
+      webmSrc: webmSrc,
+      mp4Src: mp4Src
     });
   };
 
@@ -71,15 +74,17 @@
   var buildHTML5Video = function (opts) {
     opts = opts || {};
     var height = opts.height || 450,
-        width = opts.width || 600,
+        width = opts.width || '100%',
         $element = opts.$element || $('<div />'),
         src = opts.src || $element.data('src'),
+        webmSrc = opts.webmSrc || (src + '.webm'),
+        mp4Src = opts.mp4Src || (src + '.mp4'),
         wrapChildSources = opts.wrapChildSources || false,
         $video = $('<video>', {
-          height: 450,
-          width: 600,
+          height: height,
+          width: width,
           loop: '',
-          autoplay: '',
+          //autoplay: '',
           controls: '',
           muted: 'muted'
         }),
@@ -87,11 +92,13 @@
 
     if (wrapChildSources) {
       $webmSource = $('<source>', {
-        src: src + '.webm',
+        id: 'webmsource',
+        src: webmSrc,
         type: 'video/webm'
       });
-        $mp4Source = $('<source>', {
-        src: src + '.mp4',
+      $mp4Source = $('<source>', {
+        id: 'mp4source',
+        src: mp4Src,
         type: 'video/mp4'
       });
 
@@ -139,7 +146,7 @@
   var buildiFrame = function (opts) {
     opts = opts || {}
     var height = opts.height || 450,
-        width = opts.width || 600,
+        width = opts.width || '100%',
         scrolling = opts.scrolling || 'no',
         $element = opts.$element || $('<div />'),
         src = opts.src || $element.data('src'),
