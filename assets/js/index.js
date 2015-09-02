@@ -78,7 +78,7 @@
         webmSrc, mp4Src;
 
     $.ajax({
-      url: 'http://gfycat.com/cajax/get/' + gfyCatDealie,
+      url: '//gfycat.com/cajax/get/' + gfyCatDealie,
       type: 'GET'
     }).done(function (response) {
       webmSrc = response.gfyItem.webmUrl;
