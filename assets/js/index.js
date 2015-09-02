@@ -6,6 +6,26 @@
 (function ($, undefined) {
     "use strict";
 
+  var Ajax = (function (opts) {
+    var opts = opts || {},
+        params = opts.params || {},
+        callback = opts.callback || new Function(),
+        errCb = opts.err || new Function(),
+        url = opts.url,
+        method = opts.method || 'GET',
+        methods = {};
+
+    methods.call = function (opts) {
+      $.ajax({
+        url: url,
+        type: method,
+        data: params
+      }).done(callback).fail(errCb);
+    };
+
+    return methods;
+  }());
+
   var $document = $(document);
 
   $document.ready(function () {
@@ -31,9 +51,9 @@
         handleImgur($this);
       }
       else if (src.match(/gif/)) {
-        buildIMGwith($this);
+        buildIMGWith($this);
       }
-      else if (src.match(jpg|jpeg|png)) {
+      else if (src.match(/jpg|jpeg|png/)) {
         buildIMGWith($this);
       }
     });
@@ -55,16 +75,23 @@
   var handleGfyCat = function ($element) {
     var uriArray = $element.data('src').split('/'),
         gfyCatDealie = uriArray[uriArray.length - 1],
-        src = '//gfycat.com/' + gfyCatDealie,
-        webmSrc = '//zippy.gfycat.com/' + gfyCatDealie + '.webm',
-        mp4Src = '//fat.gfycat.com/' + gfyCatDealie + '.mp4';
+        webmSrc, mp4Src;
 
-    buildHTML5Video({
-      $element: $element,
-      wrapChildSources: true,
-      webmSrc: webmSrc,
-      mp4Src: mp4Src
-    });
+    $.ajax({
+      url: 'http://gfycat.com/cajax/get/' + gfyCatDealie,
+      type: 'GET'
+    }).done(function (response) {
+      webmSrc = response.gfyItem.webmUrl;
+      mp4Src = response.gfyItem.mp4Url;
+      buildHTML5Video({
+        $element: $element,
+        wrapChildSources: true,
+        webmSrc: webmSrc,
+        mp4Src: mp4Src
+      });
+    }).fail(function () {
+      console.log("Error: Failure to retrieve response for gfycat: ", gfyCatDealie);
+    });;
   };
 
   var handleImgur = function ($element) {
@@ -95,8 +122,10 @@
         width = opts.width || '100%',
         $element = opts.$element || $('<div />'),
         src = opts.src || $element.data('src'),
-        webmSrc = opts.webmSrc || (src + '.webm'),
-        mp4Src = opts.mp4Src || (src + '.mp4'),
+        //webmSrc = opts.webmSrc || (src + '.webm'),
+        //mp4Src = opts.mp4Src || (src + '.mp4'),
+        webmSrc = opts.webmSrc || false,
+        mp4Src = opts.mp4Src || false,
         wrapChildSources = opts.wrapChildSources || false,
         $video = $('<video>', {
           height: height,
@@ -106,22 +135,27 @@
           controls: '',
           muted: 'muted'
         }),
+        webmID = opts.webmID || 'webmsource',
+        mp4ID = opts.mp4ID || 'mp4source',
         $webmSource, $mp4Source;
 
     if (wrapChildSources) {
-      $webmSource = $('<source>', {
-        id: 'webmsource',
-        src: webmSrc,
-        type: 'video/webm'
-      });
-      $mp4Source = $('<source>', {
-        id: 'mp4source',
-        src: mp4Src,
-        type: 'video/mp4'
-      });
-
-      $video.append($webmSource);
-      $video.append($mp4Source);
+      if (webmSrc) {
+        $webmSource = $('<source>', {
+          id: webmID,
+          src: webmSrc,
+          type: 'video/webm'
+        });
+        $video.append($webmSource);
+      }
+      if (mp4Src) {
+        $mp4Source = $('<source>', {
+          id: mp4ID,
+          src: mp4Src,
+          type: 'video/mp4'
+        });
+        $video.append($mp4Source);
+      }
     }
     else {
       $video.attr('src', src);
@@ -131,11 +165,10 @@
     return $element;
   };
 
-  var buildIMGwith = function ($element) {
+  var buildIMGWith = function ($element) {
     var $img = $('<img>', {
           src: $element.data('src'),
-          height: 450,
-          width: 600
+          width: "100%"
         });
 
     handleClick($element, $img);
