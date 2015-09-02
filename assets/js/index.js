@@ -56,18 +56,13 @@
     return methods;
   }());
 
-  var $document = $(document);
+  var J = function (opts) {
+    opts = opts || {};
+    var methods = {},
+        $element = opts.$element || $('<div>'),
+        src = opts.src || data('src') || $element.attr('href');
 
-  $document.ready(function () {
-    checkInlineMedia();
-    setArcticScroll();
-  });
-
-  var checkInlineMedia = function () {
-    $('a[data-inline]').each(function () {
-      var $this = $(this),
-          src = $this.data('src');
-
+    function init () {
       if (src.match(/streamable/)) {
         handleStreamableMedia($this);
       }
@@ -89,168 +84,196 @@
       else if (src.match(/youtube/)) {
         handleYouTube($this);
       }
-    });
-  };
+    };
 
-  var handleStreamableMedia = function ($element) {
-    var uriArray = $element.data('src').split('/'),
-        streamableId = uriArray[uriArray.length - 1],
-        src = '//streamable.com/res/' + streamableId;
+    // Various handlers
+    var handleStreamableMedia = function ($element) {
+      var uriArray = $element.data('src').split('/'),
+          streamableId = uriArray[uriArray.length - 1],
+          src = '//streamable.com/res/' + streamableId;
 
-    buildiFrame({
-      $element: $element,
-      width: '100%',
-      src: src,
-      scrolling: 'no'
-    });
-  };
+      buildiFrame({
+        $element: $element,
+        width: '100%',
+        src: src,
+        scrolling: 'no'
+      });
+    };
 
-  var handleGfyCat = function ($element) {
-    var uriArray = $element.data('src').split('/'),
-        gfyCatDealie = uriArray[uriArray.length - 1],
-        webmSrc, mp4Src;
+    var handleGfyCat = function ($element) {
+      var uriArray = $element.data('src').split('/'),
+          gfyCatDealie = uriArray[uriArray.length - 1],
+          webmSrc, mp4Src;
 
-    $.ajax({
-      url: '//gfycat.com/cajax/get/' + gfyCatDealie,
-      type: 'GET'
-    }).done(function (response) {
-      webmSrc = response.gfyItem.webmUrl;
-      mp4Src = response.gfyItem.mp4Url;
+      $.ajax({
+        url: '//gfycat.com/cajax/get/' + gfyCatDealie,
+        type: 'GET'
+      }).done(function (response) {
+        webmSrc = response.gfyItem.webmUrl;
+        mp4Src = response.gfyItem.mp4Url;
+        buildHTML5Video({
+          $element: $element,
+          wrapChildSources: true,
+          webmSrc: webmSrc,
+          mp4Src: mp4Src
+        });
+      }).fail(function () {
+        console.log("Error: Failure to retrieve response for gfycat: ", gfyCatDealie);
+      });;
+    };
+
+    var handleYouTube = function ($element) {
+      var src = $element.data('src'),
+          result = Ajax.parser(src),
+          ytKey = result.search.split('=')[1];
+
+      buildiFrame({
+        $element: $element,
+        src: '//youtube.com/embed/' + ytKey
+      });
+    };
+
+    var handleImgur = function ($element) {
+      var arr = $element.data('src').split('.');
+      arr.pop();
+      var src = arr.join('.'),
+          webmSrc = src + '.webm',
+          mp4Src = src + '.mp4';
+
       buildHTML5Video({
         $element: $element,
         wrapChildSources: true,
         webmSrc: webmSrc,
         mp4Src: mp4Src
       });
-    }).fail(function () {
-      console.log("Error: Failure to retrieve response for gfycat: ", gfyCatDealie);
-    });;
-  };
 
-  var handleYouTube = function ($element) {
-    var src = $element.data('src'),
-        result = Ajax.parser(src),
-        ytKey = result.search.split('=')[1];
+    };
 
-    buildiFrame({
-      $element: $element,
-      src: '//youtube.com/embed/' + ytKey
-    });
-  }
+    var handleVidFile = function ($element) {
+      buildHTML5Video({
+        $element: $element
+      });
+    };
 
-  var handleImgur = function ($element) {
-    var arr = $element.data('src').split('.');
-    arr.pop();
-    var src = arr.join('.'),
-        webmSrc = src + '.webm',
-        mp4Src = src + '.mp4';
+    // f()s that build html elments
+    var buildHTML5Video = function (opts) {
+      opts = opts || {};
+      var height = opts.height || 450,
+          width = opts.width || '100%',
+          $element = opts.$element || $('<div />'),
+          src = opts.src || $element.data('src'),
+          //webmSrc = opts.webmSrc || (src + '.webm'),
+          //mp4Src = opts.mp4Src || (src + '.mp4'),
+          webmSrc = opts.webmSrc || false,
+          mp4Src = opts.mp4Src || false,
+          wrapChildSources = opts.wrapChildSources || false,
+          $video = $('<video>', {
+            height: height,
+            width: width,
+            loop: '',
+            //autoplay: '',
+            controls: '',
+            muted: 'muted'
+          }),
+          webmID = opts.webmID || 'webmsource',
+          mp4ID = opts.mp4ID || 'mp4source',
+          $webmSource, $mp4Source;
 
-    buildHTML5Video({
-      $element: $element,
-      wrapChildSources: true,
-      webmSrc: webmSrc,
-      mp4Src: mp4Src
-    });
-
-  };
-
-  var handleVidFile = function ($element) {
-    buildHTML5Video({
-      $element: $element
-    });
-  };
-
-  var buildHTML5Video = function (opts) {
-    opts = opts || {};
-    var height = opts.height || 450,
-        width = opts.width || '100%',
-        $element = opts.$element || $('<div />'),
-        src = opts.src || $element.data('src'),
-        //webmSrc = opts.webmSrc || (src + '.webm'),
-        //mp4Src = opts.mp4Src || (src + '.mp4'),
-        webmSrc = opts.webmSrc || false,
-        mp4Src = opts.mp4Src || false,
-        wrapChildSources = opts.wrapChildSources || false,
-        $video = $('<video>', {
-          height: height,
-          width: width,
-          loop: '',
-          //autoplay: '',
-          controls: '',
-          muted: 'muted'
-        }),
-        webmID = opts.webmID || 'webmsource',
-        mp4ID = opts.mp4ID || 'mp4source',
-        $webmSource, $mp4Source;
-
-    if (wrapChildSources) {
-      if (webmSrc) {
-        $webmSource = $('<source>', {
-          id: webmID,
-          src: webmSrc,
-          type: 'video/webm'
-        });
-        $video.append($webmSource);
-      }
-      if (mp4Src) {
-        $mp4Source = $('<source>', {
-          id: mp4ID,
-          src: mp4Src,
-          type: 'video/mp4'
-        });
-        $video.append($mp4Source);
-      }
-    }
-    else {
-      $video.attr('src', src);
-    }
-
-    handleClick($element, $video);
-    return $element;
-  };
-
-  var buildIMGWith = function ($element) {
-    var $img = $('<img>', {
-          src: $element.data('src'),
-          width: "100%"
-        });
-
-    handleClick($element, $img);
-  };
-
-  var buildiFrame = function (opts) {
-    opts = opts || {}
-    var height = opts.height || 450,
-        width = opts.width || 710,
-        scrolling = opts.scrolling || 'no',
-        $element = opts.$element || $('<div />'),
-        src = opts.src || $element.data('src'),
-        $iframe = $('<iframe>', {
-          src: src,
-          frameboarder: 0,
-          height: height,
-          width: width,
-          scrolling: scrolling,
-          allowfullscreen: ''
-        });
-
-    handleClick($element, $iframe);
-
-    return $element;
-  }
-
-  var handleClick = function ($trigger, $ammo) {
-    $trigger.on('click', function (e) {
-      e.preventDefault();
-
-      if ($ammo.is(':visible')) {
-        $ammo.detach();
+      if (wrapChildSources) {
+        if (webmSrc) {
+          $webmSource = $('<source>', {
+            id: webmID,
+            src: webmSrc,
+            type: 'video/webm'
+          });
+          $video.append($webmSource);
+        }
+        if (mp4Src) {
+          $mp4Source = $('<source>', {
+            id: mp4ID,
+            src: mp4Src,
+            type: 'video/mp4'
+          });
+          $video.append($mp4Source);
+        }
       }
       else {
-        $ammo.appendTo($trigger);
+        $video.attr('src', src);
       }
+
+      handleClick($element, $video);
+      return $element;
+    };
+
+    var buildIMGWith = function ($element) {
+      var $img = $('<img>', {
+            src: $element.data('src'),
+            width: "100%"
+          });
+
+      handleClick($element, $img);
+    };
+
+    var buildiFrame = function (opts) {
+      opts = opts || {}
+      var height = opts.height || 450,
+          width = opts.width || 710,
+          scrolling = opts.scrolling || 'no',
+          $element = opts.$element || $('<div />'),
+          src = opts.src || $element.data('src'),
+          $iframe = $('<iframe>', {
+            src: src,
+            frameboarder: 0,
+            height: height,
+            width: width,
+            scrolling: scrolling,
+            allowfullscreen: ''
+          });
+
+      handleClick($element, $iframe);
+
+      return $element;
+    };
+
+    // event handlers
+    var handleClick = function ($trigger, $ammo) {
+      $trigger.on('click', function (e) {
+        e.preventDefault();
+
+        if ($ammo.is(':visible')) {
+          $ammo.detach();
+        }
+        else {
+          $ammo.appendTo($trigger);
+        }
+      });
+    };
+
+    return methods;
+  };
+
+  var $document = $(document),
+      dealieArray = [];
+
+  $document.ready(function () {
+    checkInlineMedia();
+    setArcticScroll();
+  });
+
+  var checkInlineMedia = function () {
+    $('a[data-inline]').each(function () {
+      var $this = $(this),
+          src = $this.data('src'),
+          dealie = new J({
+            $element: $this,
+            src: src
+          });
+
+      dealieArray.push(dealie);
     });
-  }
+  };
+
+
 
   // Arctic Scroll Source
   var setArcticScroll = function () {
