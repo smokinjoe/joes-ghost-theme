@@ -56,6 +56,9 @@
       else if (src.match(/jpg|jpeg|png/)) {
         buildIMGWith($this);
       }
+      else if (src.match(/youtube/)) {
+        handleYouTube($this);
+      }
     });
   };
 
@@ -93,6 +96,15 @@
       console.log("Error: Failure to retrieve response for gfycat: ", gfyCatDealie);
     });;
   };
+
+  var handleYouTube = function ($element) {
+    var src = $element.data('src');
+
+    buildiFrame({
+      $element: $element,
+      src: src
+    });
+  }
 
   var handleImgur = function ($element) {
     var arr = $element.data('src').split('.');
@@ -186,7 +198,8 @@
           frameboarder: 0,
           height: height,
           width: width,
-          scrolling: scrolling
+          scrolling: scrolling,
+          allowfullscreen: ''
         });
 
     handleClick($element, $iframe);
