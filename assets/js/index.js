@@ -23,6 +23,36 @@
       }).done(callback).fail(errCb);
     };
 
+
+        /*
+          var parser = document.createElement('a');
+          parser.href = "http://example.com:3000/pathname/?search=test#hash";
+          parser.protocol; // => "http:"
+          parser.hostname; // => "example.com"
+          parser.port;     // => "3000"
+          parser.pathname; // => "/pathname/"
+          parser.search;   // => "?search=test"
+          parser.hash;     // => "#hash"
+          parser.host;     // => "example.com:3000"
+        */
+    methods.parser = function (url) {
+      var parser = document.createElement('a'),
+          structure = {};
+      parser.href = url;
+
+      structure = {
+        protocol: parser.protocol,
+        hostname: parser.hostname,
+        port: parser.port,
+        pathname: parser.pathname,
+        search: parser.search,
+        hash: parser.hash,
+        host: parser.host
+      };
+
+      return structure;
+    };
+
     return methods;
   }());
 
@@ -98,11 +128,13 @@
   };
 
   var handleYouTube = function ($element) {
-    var src = $element.data('src');
+    var src = $element.data('src'),
+        result = Ajax.parser(src),
+        ytKey = result.search.split('=')[1];
 
     buildiFrame({
       $element: $element,
-      src: src
+      src: '//youtube.com/embed/' + ytKey
     });
   }
 
