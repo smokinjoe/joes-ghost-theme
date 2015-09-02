@@ -59,7 +59,7 @@
   var J = function (opts) {
     opts = opts || {};
     var methods = {},
-        $element = opts.$element || $('<div>'),
+        $this = opts.$element || $('<div>'),
         src = opts.src || data('src') || $element.attr('href');
 
     function init () {
@@ -248,6 +248,8 @@
         }
       });
     };
+
+    init();
 
     return methods;
   };
