@@ -94,15 +94,25 @@
     };
 
     var cleanseOptions = function ($element, options) {
-      options =               options || $element.data('inline') || {},
-      options.$element =      $element || $("<div />"),
-      options.src =           options.src || $element.data('src') || $element.attr('href'),
-      options.autoplay =      options.autoplay || false,
+      if ($.isEmptyObject(options)) {
+
+        if ($element.data('inline')) {
+          options = $element.data('inline');
+        }
+        else {
+          var args = $element.text().split(',');
+          options = args[1] ? JSON.parse(args[1]) || {} : {};
+          options.body = args[0];
+        }
+
+      }
+
+      options.$element =      $element || $("<div />");
+      options.body =          options.body || $element.text();
+      options.src =           options.src || $element.data('src') || $element.attr('href');
+      options.autoplay =      options.autoplay || false;
       options.trigger =       options.trigger || TRIGGER_DEFAULT;
 
-      if ($element.text() === "the new old fashioned way - removing src attribute") {
-        debugger;
-      }
       return options;
     };
 
@@ -174,9 +184,7 @@
     };
 
     var handleVidFile = function (opts) {
-      buildHTML5Video({
-        $element: opts.$element
-      });
+      buildHTML5Video(opts);
     };
 
     // f()s that build html elments
@@ -186,6 +194,7 @@
           width = opts.width || '100%',
           $element = opts.$element || $('<div />'),
           src = opts.src || $element.data('src'),
+          autoplay = opts.autoplay,
           //webmSrc = opts.webmSrc || (src + '.webm'),
           //mp4Src = opts.mp4Src || (src + '.mp4'),
           webmSrc = opts.webmSrc || false,
@@ -195,7 +204,7 @@
             height: height,
             width: width,
             loop: '',
-            //autoplay: '',
+            autoplay: autoplay,
             controls: '',
             muted: 'muted'
           }),
