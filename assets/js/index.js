@@ -4,7 +4,12 @@
 
 /* globals jQuery, document */
 (function ($, undefined) {
-    "use strict";
+  "use strict";
+
+  var TRIGGER_CLICK = 'click',
+      TRIGGER_HOVER = 'hover',
+      TRIGGER_AUTO = 'auto',
+      TRIGGER_DEFAULT = TRIGGER_CLICK;
 
   var Ajax = (function (opts) {
     var opts = opts || {},
@@ -56,41 +61,57 @@
     return methods;
   }());
 
-  var J = function (opts) {
-    opts = opts || {};
-    var methods = {},
-        $element = opts.$element || $('<div>'),
-        src = opts.src || data('src') || $element.attr('href');
+  var J = function ($element, opts) {
+    var methods = {};
 
     function init () {
-      if (src.match(/streamable/)) {
-        handleStreamableMedia($this);
+      opts = cleanseOptions($element, opts);
+
+      if (opts.src.match(/streamable/)) {
+        handleStreamableMedia(opts);
       }
-      else if (src.match(/mp4/)) {
-        handleVidFile($this);
+      else if (opts.src.match(/mp4/)) {
+        handleVidFile(opts);
       }
-      else if (src.match(/gfycat/)) {
-        handleGfyCat($this);
+      else if (opts.src.match(/gfycat/)) {
+        handleGfyCat(opts);
       }
-      else if (src.match(/gifv/)) {
-        handleImgur($this);
+      else if (opts.src.match(/gifv/)) {
+        handleImgur(opts);
       }
-      else if (src.match(/gif/)) {
-        buildIMGWith($this);
+      else if (opts.src.match(/gif/)) {
+        buildIMGWith(opts);
       }
-      else if (src.match(/jpg|jpeg|png/)) {
-        buildIMGWith($this);
+      else if (opts.src.match(/jpg|jpeg|png/)) {
+        buildIMGWith(opts);
       }
-      else if (src.match(/youtube/)) {
-        handleYouTube($this);
+      else if (opts.src.match(/youtube/)) {
+        handleYouTube(opts);
+      }
+      else {
+        console.log("JOE: Link doesn't have fun media.");
       }
     };
 
+    var cleanseOptions = function ($element, options) {
+      options =               options || $element.data('inline') || {},
+      options.$element =      $element || $("<div />"),
+      options.src =           options.src || $element.data('src') || $element.attr('href'),
+      options.autoplay =      options.autoplay || false,
+      options.trigger =       options.trigger || TRIGGER_DEFAULT;
+
+      if ($element.text() === "the new old fashioned way - removing src attribute") {
+        debugger;
+      }
+      return options;
+    };
+
     // Various handlers
-    var handleStreamableMedia = function ($element) {
-      var uriArray = $element.data('src').split('/'),
+    var handleStreamableMedia = function (opts) {
+      var uriArray = opts.src.split('/'),
           streamableId = uriArray[uriArray.length - 1],
-          src = '//streamable.com/res/' + streamableId;
+          src = '//streamable.com/res/' + streamableId,
+          $element = opts.$element;
 
       buildiFrame({
         $element: $element,
@@ -100,9 +121,10 @@
       });
     };
 
-    var handleGfyCat = function ($element) {
-      var uriArray = $element.data('src').split('/'),
+    var handleGfyCat = function (opts) {
+      var uriArray = opts.src.split('/'),
           gfyCatDealie = uriArray[uriArray.length - 1],
+          $element = opts.$element,
           webmSrc, mp4Src;
 
       $.ajax({
@@ -122,10 +144,11 @@
       });;
     };
 
-    var handleYouTube = function ($element) {
-      var src = $element.data('src'),
+    var handleYouTube = function (opts) {
+      var src = opts.src,
           result = Ajax.parser(src),
-          ytKey = result.search.split('=')[1];
+          ytKey = result.search.split('=')[1],
+          $element = opts.$element;
 
       buildiFrame({
         $element: $element,
@@ -133,8 +156,9 @@
       });
     };
 
-    var handleImgur = function ($element) {
-      var arr = $element.data('src').split('.');
+    var handleImgur = function (opts) {
+      var $element = opts.$element,
+          arr = $element.data('src').split('.');
       arr.pop();
       var src = arr.join('.'),
           webmSrc = src + '.webm',
@@ -149,9 +173,9 @@
 
     };
 
-    var handleVidFile = function ($element) {
+    var handleVidFile = function (opts) {
       buildHTML5Video({
-        $element: $element
+        $element: opts.$element
       });
     };
 
@@ -249,6 +273,8 @@
       });
     };
 
+    init();
+
     return methods;
   };
 
@@ -261,13 +287,19 @@
   });
 
   var checkInlineMedia = function () {
-    $('a[data-inline]').each(function () {
+    // $('a[data-inline]').each(function () {
+    //   var $this = $(this),
+    //       src = $this.data('src'),
+    //       dealie = new J({
+    //         $element: $this
+    //       });
+
+    //   dealieArray.push(dealie);
+    // });
+
+    $('a').each(function () {
       var $this = $(this),
-          src = $this.data('src'),
-          dealie = new J({
-            $element: $this,
-            src: src
-          });
+          dealie = new J($this, {});
 
       dealieArray.push(dealie);
     });
