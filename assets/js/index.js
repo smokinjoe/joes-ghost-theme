@@ -11,37 +11,78 @@
       TRIGGER_AUTO = 'auto',
       TRIGGER_DEFAULT = TRIGGER_CLICK;
 
-  var Ajax = (function (opts) {
-    var opts = opts || {},
-        params = opts.params || {},
+  // var Ajax = (function (opts) {
+  //   opts = opts || {};
+  //   let params = opts.params || {},
+  //       callback = opts.callback || new Function(),
+  //       errCb = opts.err || new Function(),
+  //       url = opts.url,
+  //       method = opts.method || 'GET',
+  //       methods = {};
+
+  //   methods.call = function (opts) {
+  //     $.ajax({
+  //       url: url,
+  //       type: method,
+  //       data: params
+  //     }).done(callback).fail(errCb);
+  //   };
+
+
+
+  //         var parser = document.createElement('a');
+  //         parser.href = "http://example.com:3000/pathname/?search=test#hash";
+  //         parser.protocol; // => "http:"
+  //         parser.hostname; // => "example.com"
+  //         parser.port;     // => "3000"
+  //         parser.pathname; // => "/pathname/"
+  //         parser.search;   // => "?search=test"
+  //         parser.hash;     // => "#hash"
+  //         parser.host;     // => "example.com:3000"
+
+  //   methods.parser = function (url) {
+  //     let parser = document.createElement('a'),
+  //         structure = {};
+  //     parser.href = url;
+
+  //     structure = {
+  //       protocol: parser.protocol,
+  //       hostname: parser.hostname,
+  //       port: parser.port,
+  //       pathname: parser.pathname,
+  //       search: parser.search,
+  //       hash: parser.hash,
+  //       host: parser.host
+  //     };
+
+  //     return structure;
+  //   };
+
+  //   return methods;
+  // }());
+
+  class Ajax {
+    constructor () {
+    }
+
+    static call (opts) {
+      opts = opts || {};
+      let params = opts.params || {},
         callback = opts.callback || new Function(),
         errCb = opts.err || new Function(),
         url = opts.url,
-        method = opts.method || 'GET',
-        methods = {};
+        method = opts.method || opts.type || 'GET';
 
-    methods.call = function (opts) {
       $.ajax({
         url: url,
         type: method,
         data: params
       }).done(callback).fail(errCb);
-    };
+    }
 
-
-        /*
-          var parser = document.createElement('a');
-          parser.href = "http://example.com:3000/pathname/?search=test#hash";
-          parser.protocol; // => "http:"
-          parser.hostname; // => "example.com"
-          parser.port;     // => "3000"
-          parser.pathname; // => "/pathname/"
-          parser.search;   // => "?search=test"
-          parser.hash;     // => "#hash"
-          parser.host;     // => "example.com:3000"
-        */
-    methods.parser = function (url) {
-      var parser = document.createElement('a'),
+    static parser (url) {
+      url = url || this.url || '';
+      let parser = document.createElement('a'),
           structure = {};
       parser.href = url;
 
@@ -56,13 +97,11 @@
       };
 
       return structure;
-    };
-
-    return methods;
-  }());
+    }
+  };
 
   var J = function ($element, opts) {
-    var methods = {},
+    let methods = {},
         config = {};
 
     function init () {
@@ -95,7 +134,7 @@
     };
 
     var u = (function () {
-      var methods = {};
+      let methods = {};
       methods.rest = (arr) => {
         var clone = methods.clone(arr, []);
         clone.splice(0, 1);
@@ -133,7 +172,7 @@
 
     // Various handlers
     var handleStreamableMedia = function (opts) {
-      var uriArray = opts.src.split('/'),
+      let uriArray = opts.src.split('/'),
           streamableId = uriArray[uriArray.length - 1],
           src = '//streamable.com/res/' + streamableId,
           $element = opts.$element;
@@ -147,30 +186,48 @@
     };
 
     var handleGfyCat = function (opts) {
-      var uriArray = opts.src.split('/'),
+      let uriArray = opts.src.split('/'),
           gfyCatDealie = uriArray[uriArray.length - 1],
           $element = opts.$element,
           webmSrc, mp4Src;
 
-      $.ajax({
+      Ajax.call({
         url: '//gfycat.com/cajax/get/' + gfyCatDealie,
-        type: 'GET'
-      }).done(function (response) {
-        webmSrc = response.gfyItem.webmUrl;
-        mp4Src = response.gfyItem.mp4Url;
-        buildHTML5Video({
-          $element: $element,
-          wrapChildSources: true,
-          webmSrc: webmSrc,
-          mp4Src: mp4Src
-        });
-      }).fail(function () {
-        console.log("Error: Failure to retrieve response for gfycat: ", gfyCatDealie);
-      });;
+        method: 'GET',
+        callback: function (response) {
+          webmSrc = response.gfyItem.webmUrl;
+          mp4Src = response.gfyItem.mp4Url;
+          buildHTML5Video({
+            $element: $element,
+            wrapChildSources: true,
+            webmSrc: webmSrc,
+            mp4Src: mp4Src
+          });
+        },
+        errCb: function () {
+          console.log("Error: Failure to retrieve response for gfycat: ", gfyCatDealie);
+        }
+      });
+
+      // $.ajax({
+      //   url: '//gfycat.com/cajax/get/' + gfyCatDealie,
+      //   type: 'GET'
+      // }).done(function (response) {
+      //   webmSrc = response.gfyItem.webmUrl;
+      //   mp4Src = response.gfyItem.mp4Url;
+      //   buildHTML5Video({
+      //     $element: $element,
+      //     wrapChildSources: true,
+      //     webmSrc: webmSrc,
+      //     mp4Src: mp4Src
+      //   });
+      // }).fail(function () {
+      //   console.log("Error: Failure to retrieve response for gfycat: ", gfyCatDealie);
+      // });;
     };
 
     var handleYouTube = function (opts) {
-      var src = opts.src,
+      let src = opts.src,
           result = Ajax.parser(src),
           ytKey = result.search.split('=')[1],
           $element = opts.$element;
@@ -182,10 +239,10 @@
     };
 
     var handleImgur = function (opts) {
-      var $element = opts.$element,
+      let $element = opts.$element,
           arr = $element.data('src').split('.');
       arr.pop();
-      var src = arr.join('.'),
+      let src = arr.join('.'),
           webmSrc = src + '.webm',
           mp4Src = src + '.mp4';
 
@@ -205,7 +262,7 @@
     // f()s that build html elments
     var buildHTML5Video = function (opts) {
       opts = opts || {};
-      var height = opts.height || 450,
+      let height = opts.height || 450,
           width = opts.width || '100%',
           $element = opts.$element || $('<div />'),
           src = opts.src || $element.data('src'),
@@ -254,7 +311,7 @@
     };
 
     var buildIMGWith = function ($element) {
-      var $img = $('<img>', {
+      let $img = $('<img>', {
             src: $element.data('src'),
             width: "100%"
           });
@@ -264,7 +321,7 @@
 
     var buildiFrame = function (opts) {
       opts = opts || {}
-      var height = opts.height || 450,
+      let height = opts.height || 450,
           width = opts.width || 710,
           scrolling = opts.scrolling || 'no',
           $element = opts.$element || $('<div />'),
@@ -284,7 +341,7 @@
     };
 
     var finishItUp = function ($element, $mediaElement, opts) {
-      var trigger = opts.trigger;
+      let trigger = opts.trigger;
       switch (opts.trigger) {
         case TRIGGER_CLICK:
           handleClick($element, $mediaElement);
@@ -295,6 +352,10 @@
         case TRIGGER_AUTO:
           showMedia($element, $mediaElement);
         break;
+      }
+
+      if (opts.body) {
+        $element.text(opts.body);
       }
     };
 
@@ -355,7 +416,7 @@
     // });
 
     $('a').each(function () {
-      var $this = $(this),
+      let $this = $(this),
           dealie = new J($this, {});
 
       dealieArray.push(dealie);
