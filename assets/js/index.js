@@ -11,59 +11,8 @@
       TRIGGER_AUTO = 'auto',
       TRIGGER_DEFAULT = TRIGGER_CLICK;
 
-  // var Ajax = (function (opts) {
-  //   opts = opts || {};
-  //   let params = opts.params || {},
-  //       callback = opts.callback || new Function(),
-  //       errCb = opts.err || new Function(),
-  //       url = opts.url,
-  //       method = opts.method || 'GET',
-  //       methods = {};
-
-  //   methods.call = function (opts) {
-  //     $.ajax({
-  //       url: url,
-  //       type: method,
-  //       data: params
-  //     }).done(callback).fail(errCb);
-  //   };
-
-
-
-  //         var parser = document.createElement('a');
-  //         parser.href = "http://example.com:3000/pathname/?search=test#hash";
-  //         parser.protocol; // => "http:"
-  //         parser.hostname; // => "example.com"
-  //         parser.port;     // => "3000"
-  //         parser.pathname; // => "/pathname/"
-  //         parser.search;   // => "?search=test"
-  //         parser.hash;     // => "#hash"
-  //         parser.host;     // => "example.com:3000"
-
-  //   methods.parser = function (url) {
-  //     let parser = document.createElement('a'),
-  //         structure = {};
-  //     parser.href = url;
-
-  //     structure = {
-  //       protocol: parser.protocol,
-  //       hostname: parser.hostname,
-  //       port: parser.port,
-  //       pathname: parser.pathname,
-  //       search: parser.search,
-  //       hash: parser.hash,
-  //       host: parser.host
-  //     };
-
-  //     return structure;
-  //   };
-
-  //   return methods;
-  // }());
-
   class Ajax {
-    constructor () {
-    }
+    constructor () {}
 
     static call (opts) {
       opts = opts || {};
