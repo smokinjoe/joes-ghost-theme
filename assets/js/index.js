@@ -6,7 +6,7 @@
 (function ($, undefined) {
   "use strict";
 
-  var TRIGGER_CLICK = 'click',
+  const TRIGGER_CLICK = 'click',
       TRIGGER_HOVER = 'hover',
       TRIGGER_AUTO = 'auto',
       TRIGGER_DEFAULT = TRIGGER_CLICK;
@@ -62,31 +62,32 @@
   }());
 
   var J = function ($element, opts) {
-    var methods = {};
+    var methods = {},
+        config = {};
 
     function init () {
-      opts = cleanseOptions($element, opts);
+      config = cleanseOptions($element, opts);
 
-      if (opts.src.match(/streamable/)) {
-        handleStreamableMedia(opts);
+      if (config.src.match(/streamable/)) {
+        handleStreamableMedia(config);
       }
-      else if (opts.src.match(/mp4/)) {
-        handleVidFile(opts);
+      else if (config.src.match(/mp4/)) {
+        handleVidFile(config);
       }
-      else if (opts.src.match(/gfycat/)) {
-        handleGfyCat(opts);
+      else if (config.src.match(/gfycat/)) {
+        handleGfyCat(config);
       }
-      else if (opts.src.match(/gifv/)) {
-        handleImgur(opts);
+      else if (config.src.match(/gifv/)) {
+        handleImgur(config);
       }
-      else if (opts.src.match(/gif/)) {
-        buildIMGWith(opts);
+      else if (config.src.match(/gif/)) {
+        buildIMGWith(config);
       }
-      else if (opts.src.match(/jpg|jpeg|png/)) {
-        buildIMGWith(opts);
+      else if (config.src.match(/jpg|jpeg|png/)) {
+        buildIMGWith(config);
       }
-      else if (opts.src.match(/youtube/)) {
-        handleYouTube(opts);
+      else if (config.src.match(/youtube/)) {
+        handleYouTube(config);
       }
       else {
         console.log("JOE: Link doesn't have fun media.");
@@ -234,7 +235,7 @@
         $video.attr('src', src);
       }
 
-      handleClick($element, $video);
+      finishItUp($element, $video, config);
       return $element;
     };
 
@@ -244,7 +245,7 @@
             width: "100%"
           });
 
-      handleClick($element, $img);
+      finishItUp($element, $img, config);
     };
 
     var buildiFrame = function (opts) {
@@ -263,14 +264,29 @@
             allowfullscreen: ''
           });
 
-      handleClick($element, $iframe);
+      finishItUp($element, $iframe, config);
 
       return $element;
     };
 
+    var finishItUp = function ($element, $mediaElement, opts) {
+      var trigger = opts.trigger;
+      switch (opts.trigger) {
+        case TRIGGER_CLICK:
+          handleClick($element, $mediaElement);
+        break;
+        case TRIGGER_HOVER:
+          handleHover($element, $mediaElement);
+        break;
+        case TRIGGER_AUTO:
+          showMedia($element, $mediaElement);
+        break;
+      }
+    };
+
     // event handlers
     var handleClick = function ($trigger, $ammo) {
-      $trigger.on('click', function (e) {
+      $trigger.on('click', (e) => {
         e.preventDefault();
 
         if ($ammo.is(':visible')) {
@@ -280,6 +296,24 @@
           $ammo.appendTo($trigger);
         }
       });
+    };
+
+    var handleHover = function ($trigger, $ammo) {
+      $trigger.on('click', (e) => e.preventDefault());
+      $trigger.on('mouseenter', (e) => {
+        if (!$ammo.is(':visible')) {
+          $ammo.appendTo($trigger);
+        }
+      });
+      $trigger.on('mouseleave', (e) => {
+        if ($ammo.is(':visible')) {
+          $ammo.detach();
+        }
+      });
+    };
+
+    var showMedia = function ($trigger, $ammo) {
+      $ammo.appendTo($trigger);
     };
 
     init();
