@@ -94,6 +94,20 @@
       }
     };
 
+    var u = (function () {
+      var methods = {};
+      methods.rest = (arr) => {
+        var clone = methods.clone(arr, []);
+        clone.splice(0, 1);
+        return clone;
+      };
+      methods.clone = (thing, extender) => {
+        extender = extender || {};
+        return jQuery.extend(true, extender, thing);
+      }
+      return methods;
+    }());
+
     var cleanseOptions = function ($element, options) {
       if ($.isEmptyObject(options)) {
 
@@ -102,7 +116,7 @@
         }
         else {
           var args = $element.text().split(',');
-          options = args[1] ? JSON.parse(args[1]) || {} : {};
+          options = args[1] ? JSON.parse(u.rest(args).join(',')) || {} : {};
           options.body = args[0];
         }
 
@@ -286,7 +300,7 @@
 
     // event handlers
     var handleClick = function ($trigger, $ammo) {
-      $trigger.on('click', (e) => {
+      $trigger.on('click', e => {
         e.preventDefault();
 
         if ($ammo.is(':visible')) {
@@ -299,13 +313,13 @@
     };
 
     var handleHover = function ($trigger, $ammo) {
-      $trigger.on('click', (e) => e.preventDefault());
-      $trigger.on('mouseenter', (e) => {
+      $trigger.on('click', e => e.preventDefault());
+      $trigger.on('mouseenter', e => {
         if (!$ammo.is(':visible')) {
           $ammo.appendTo($trigger);
         }
       });
-      $trigger.on('mouseleave', (e) => {
+      $trigger.on('mouseleave', e => {
         if ($ammo.is(':visible')) {
           $ammo.detach();
         }
