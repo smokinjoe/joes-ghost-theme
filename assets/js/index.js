@@ -12,8 +12,6 @@
       TRIGGER_DEFAULT = TRIGGER_CLICK;
 
   class Ajax {
-    constructor () {}
-
     static call (opts) {
       opts = opts || {};
       let params = opts.params || {},
