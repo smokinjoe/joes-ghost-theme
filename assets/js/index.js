@@ -49,54 +49,20 @@
     }
   };
 
-  var J = function ($element, opts) {
-    let methods = {},
-        config = {};
-
-    function init () {
-      config = cleanseOptions($element, opts);
-
-      if (config.src.match(/streamable/)) {
-        handleStreamableMedia(config);
-      }
-      else if (config.src.match(/mp4/)) {
-        handleVidFile(config);
-      }
-      else if (config.src.match(/gfycat/)) {
-        handleGfyCat(config);
-      }
-      else if (config.src.match(/gifv/)) {
-        handleImgur(config);
-      }
-      else if (config.src.match(/gif/)) {
-        buildIMGWith(config);
-      }
-      else if (config.src.match(/jpg|jpeg|png/)) {
-        buildIMGWith(config);
-      }
-      else if (config.src.match(/youtube/)) {
-        handleYouTube(config);
-      }
-      else {
-        console.log("JOE: Link doesn't have fun media.");
-      }
+  class u {
+    static rest (arr) {
+      var clone = this.clone(arr, []);
+      clone.splice(0, 1);
+      return clone;
     };
+    static clone (thing, extender) {
+      extender = extender || {};
+      return jQuery.extend(true, extender, thing);
+    };
+  };
 
-    var u = (function () {
-      let methods = {};
-      methods.rest = (arr) => {
-        var clone = methods.clone(arr, []);
-        clone.splice(0, 1);
-        return clone;
-      };
-      methods.clone = (thing, extender) => {
-        extender = extender || {};
-        return jQuery.extend(true, extender, thing);
-      }
-      return methods;
-    }());
-
-    var cleanseOptions = function ($element, options) {
+  class J {
+    constructor ($element, options) {
       if ($.isEmptyObject(options)) {
 
         if ($element.data('inline')) {
@@ -116,11 +82,36 @@
       options.autoplay =      options.autoplay || false;
       options.trigger =       options.trigger || TRIGGER_DEFAULT;
 
-      return options;
+      let config = options;
+
+      if (config.src.match(/streamable/)) {
+        this.handleStreamableMedia(config);
+      }
+      else if (config.src.match(/mp4/)) {
+        this.handleVidFile(config);
+      }
+      else if (config.src.match(/gfycat/)) {
+        this.handleGfyCat(config);
+      }
+      else if (config.src.match(/gifv/)) {
+        this.handleImgur(config);
+      }
+      else if (config.src.match(/gif/)) {
+        this.buildIMGWith(config);
+      }
+      else if (config.src.match(/jpg|jpeg|png/)) {
+        this.buildIMGWith(config);
+      }
+      else if (config.src.match(/youtube/)) {
+        this.handleYouTube(config);
+      }
+      else {
+        console.log("JOE: Link doesn't have fun media.");
+      }
     };
 
     // Various handlers
-    var handleStreamableMedia = function (opts) {
+    static handleStreamableMedia (opts) {
       let uriArray = opts.src.split('/'),
           streamableId = uriArray[uriArray.length - 1],
           src = '//streamable.com/res/' + streamableId,
@@ -134,7 +125,7 @@
       });
     };
 
-    var handleGfyCat = function (opts) {
+    static handleGfyCat (opts) {
       let uriArray = opts.src.split('/'),
           gfyCatDealie = uriArray[uriArray.length - 1],
           $element = opts.$element,
@@ -175,7 +166,7 @@
       // });;
     };
 
-    var handleYouTube = function (opts) {
+    static handleYouTube (opts) {
       let src = opts.src,
           result = Ajax.parser(src),
           ytKey = result.search.split('=')[1],
@@ -187,7 +178,7 @@
       });
     };
 
-    var handleImgur = function (opts) {
+    static handleImgur (opts) {
       let $element = opts.$element,
           arr = $element.data('src').split('.');
       arr.pop();
@@ -204,12 +195,12 @@
 
     };
 
-    var handleVidFile = function (opts) {
+    static handleVidFile (opts) {
       buildHTML5Video(opts);
     };
 
     // f()s that build html elments
-    var buildHTML5Video = function (opts) {
+    static buildHTML5Video (opts) {
       opts = opts || {};
       let height = opts.height || 450,
           width = opts.width || '100%',
@@ -259,7 +250,7 @@
       return $element;
     };
 
-    var buildIMGWith = function ($element) {
+    static buildIMGWith ($element) {
       let $img = $('<img>', {
             src: $element.data('src'),
             width: "100%"
@@ -268,7 +259,7 @@
       finishItUp($element, $img, config);
     };
 
-    var buildiFrame = function (opts) {
+    static buildiFrame (opts) {
       opts = opts || {}
       let height = opts.height || 450,
           width = opts.width || 710,
@@ -289,7 +280,7 @@
       return $element;
     };
 
-    var finishItUp = function ($element, $mediaElement, opts) {
+    static finishItUp ($element, $mediaElement, opts) {
       let trigger = opts.trigger;
       switch (opts.trigger) {
         case TRIGGER_CLICK:
@@ -309,7 +300,7 @@
     };
 
     // event handlers
-    var handleClick = function ($trigger, $ammo) {
+    static handleClick ($trigger, $ammo) {
       $trigger.on('click', e => {
         e.preventDefault();
 
@@ -322,7 +313,7 @@
       });
     };
 
-    var handleHover = function ($trigger, $ammo) {
+    static handleHover ($trigger, $ammo) {
       $trigger.on('click', e => e.preventDefault());
       $trigger.on('mouseenter', e => {
         if (!$ammo.is(':visible')) {
@@ -336,13 +327,10 @@
       });
     };
 
-    var showMedia = function ($trigger, $ammo) {
+    static showMedia ($trigger, $ammo) {
       $ammo.appendTo($trigger);
     };
 
-    init();
-
-    return methods;
   };
 
   var $document = $(document),
