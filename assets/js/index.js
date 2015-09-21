@@ -82,7 +82,12 @@
       options.autoplay =      options.autoplay || false;
       options.trigger =       options.trigger || TRIGGER_DEFAULT;
 
-      let config = options;
+      this.config = options;
+      this.$element = options.$element;
+    };
+
+    generate () {
+      let config = this.config;
 
       if (config.src.match(/streamable/)) {
         this.handleStreamableMedia(config);
@@ -108,16 +113,16 @@
       else {
         console.log("JOE: Link doesn't have fun media.");
       }
-    };
+    }
 
     // Various handlers
-    static handleStreamableMedia (opts) {
-      let uriArray = opts.src.split('/'),
+    handleStreamableMedia () {
+      let uriArray = this.config.src.split('/'),
           streamableId = uriArray[uriArray.length - 1],
           src = '//streamable.com/res/' + streamableId,
-          $element = opts.$element;
+          $element = this.$element;
 
-      buildiFrame({
+      this.buildiFrame({
         $element: $element,
         width: '100%',
         src: src,
@@ -125,10 +130,11 @@
       });
     };
 
-    static handleGfyCat (opts) {
-      let uriArray = opts.src.split('/'),
+    handleGfyCat () {
+      let uriArray = this.config.src.split('/'),
           gfyCatDealie = uriArray[uriArray.length - 1],
-          $element = opts.$element,
+          $element = this.$element,
+          that = this,
           webmSrc, mp4Src;
 
       Ajax.call({
@@ -137,7 +143,7 @@
         callback: function (response) {
           webmSrc = response.gfyItem.webmUrl;
           mp4Src = response.gfyItem.mp4Url;
-          buildHTML5Video({
+          that.buildHTML5Video({
             $element: $element,
             wrapChildSources: true,
             webmSrc: webmSrc,
@@ -149,44 +155,29 @@
         }
       });
 
-      // $.ajax({
-      //   url: '//gfycat.com/cajax/get/' + gfyCatDealie,
-      //   type: 'GET'
-      // }).done(function (response) {
-      //   webmSrc = response.gfyItem.webmUrl;
-      //   mp4Src = response.gfyItem.mp4Url;
-      //   buildHTML5Video({
-      //     $element: $element,
-      //     wrapChildSources: true,
-      //     webmSrc: webmSrc,
-      //     mp4Src: mp4Src
-      //   });
-      // }).fail(function () {
-      //   console.log("Error: Failure to retrieve response for gfycat: ", gfyCatDealie);
-      // });;
     };
 
-    static handleYouTube (opts) {
-      let src = opts.src,
+    handleYouTube () {
+      let src = this.config.src,
           result = Ajax.parser(src),
           ytKey = result.search.split('=')[1],
-          $element = opts.$element;
+          $element = this.$element;
 
-      buildiFrame({
+      this.buildiFrame({
         $element: $element,
         src: '//youtube.com/embed/' + ytKey
       });
     };
 
-    static handleImgur (opts) {
-      let $element = opts.$element,
+    handleImgur (opts) {
+      let $element = this.config.$element,
           arr = $element.data('src').split('.');
       arr.pop();
       let src = arr.join('.'),
           webmSrc = src + '.webm',
           mp4Src = src + '.mp4';
 
-      buildHTML5Video({
+      this.buildHTML5Video({
         $element: $element,
         wrapChildSources: true,
         webmSrc: webmSrc,
@@ -195,12 +186,12 @@
 
     };
 
-    static handleVidFile (opts) {
-      buildHTML5Video(opts);
+    handleVidFile () {
+      this.buildHTML5Video(this.config);
     };
 
     // f()s that build html elments
-    static buildHTML5Video (opts) {
+    buildHTML5Video (opts) {
       opts = opts || {};
       let height = opts.height || 450,
           width = opts.width || '100%',
@@ -246,20 +237,20 @@
         $video.attr('src', src);
       }
 
-      finishItUp($element, $video, config);
+      this.finishItUp($element, $video, this.config);
       return $element;
     };
 
-    static buildIMGWith ($element) {
+    buildIMGWith ($element) {
       let $img = $('<img>', {
             src: $element.data('src'),
             width: "100%"
           });
 
-      finishItUp($element, $img, config);
+      this.finishItUp($element, $img, this.config);
     };
 
-    static buildiFrame (opts) {
+    buildiFrame (opts) {
       opts = opts || {}
       let height = opts.height || 450,
           width = opts.width || 710,
@@ -275,22 +266,22 @@
             allowfullscreen: ''
           });
 
-      finishItUp($element, $iframe, config);
+      this.finishItUp($element, $iframe, this.config);
 
       return $element;
     };
 
-    static finishItUp ($element, $mediaElement, opts) {
+    finishItUp ($element, $mediaElement, opts) {
       let trigger = opts.trigger;
       switch (opts.trigger) {
         case TRIGGER_CLICK:
-          handleClick($element, $mediaElement);
+          this.handleClick($element, $mediaElement);
         break;
         case TRIGGER_HOVER:
-          handleHover($element, $mediaElement);
+          this.handleHover($element, $mediaElement);
         break;
         case TRIGGER_AUTO:
-          showMedia($element, $mediaElement);
+          this.showMedia($element, $mediaElement);
         break;
       }
 
@@ -300,7 +291,7 @@
     };
 
     // event handlers
-    static handleClick ($trigger, $ammo) {
+    handleClick ($trigger, $ammo) {
       $trigger.on('click', e => {
         e.preventDefault();
 
@@ -313,7 +304,7 @@
       });
     };
 
-    static handleHover ($trigger, $ammo) {
+    handleHover ($trigger, $ammo) {
       $trigger.on('click', e => e.preventDefault());
       $trigger.on('mouseenter', e => {
         if (!$ammo.is(':visible')) {
@@ -327,7 +318,7 @@
       });
     };
 
-    static showMedia ($trigger, $ammo) {
+    showMedia ($trigger, $ammo) {
       $ammo.appendTo($trigger);
     };
 
@@ -356,6 +347,7 @@
       let $this = $(this),
           dealie = new J($this, {});
 
+      dealie.generate();
       dealieArray.push(dealie);
     });
   };
