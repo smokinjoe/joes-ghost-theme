@@ -82,9 +82,13 @@
 
       this.config = options;
       this.$element = options.$element;
+      this.$mediaContainer = $('<div />');
     };
 
     generate () {
+      // how is this flow going to work?
+      // I guess have the click execute the generate?
+
       let config = this.config;
 
       if (config.src.match(/streamable/)) {
@@ -110,6 +114,24 @@
       }
       else {
         console.log("JOE: Link doesn't have fun media.");
+      }
+    }
+
+    handleTrigger () {
+      let trigger = this.config.trigger;
+      switch (trigger) {
+        case TRIGGER_CLICK:
+          this.generate();
+          this.handleClick(this.config.$element, this.config.$mediaContainer);
+        break;
+        case TRIGGER_HOVER:
+          this.generate();
+          this.handleClick(this.config.$element, this.config.$mediaContainer);
+        break;
+        case TRIGGER_AUTO:
+          this.generate();
+          this.handleClick(this.config.$element, this.config.$mediaContainer);
+        break;
       }
     }
 
@@ -235,7 +257,7 @@
         $video.attr('src', src);
       }
 
-      this.finishItUp($element, $video, this.config);
+      this.finishItUp($element, $video);
       return $element;
     };
 
@@ -246,7 +268,7 @@
             width: "100%"
           });
 
-      this.finishItUp($element, $img, this.config);
+      this.finishItUp($element, $img);
     };
 
     buildiFrame (opts) {
@@ -265,28 +287,17 @@
             allowfullscreen: ''
           });
 
-      this.finishItUp($element, $iframe, this.config);
+      this.finishItUp($element, $iframe);
 
       return $element;
     };
 
-    finishItUp ($element, $mediaElement, opts) {
-      let trigger = opts.trigger;
-      switch (opts.trigger) {
-        case TRIGGER_CLICK:
-          this.handleClick($element, $mediaElement);
-        break;
-        case TRIGGER_HOVER:
-          this.handleHover($element, $mediaElement);
-        break;
-        case TRIGGER_AUTO:
-          this.showMedia($element, $mediaElement);
-        break;
+    finishItUp ($element, $mediaElement) {
+      if (this.config.body) {
+        $element.text(this.config.body);
       }
 
-      if (opts.body) {
-        $element.text(opts.body);
-      }
+      this.$mediaContainer.append($mediaElement);
     };
 
     // event handlers
