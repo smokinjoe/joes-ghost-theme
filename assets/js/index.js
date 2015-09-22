@@ -113,11 +113,11 @@
         this.handleYouTube(config);
       }
       else {
-        console.log("JOE: Link doesn't have fun media.");
+        console.log("JOE: Link doesn't have fun media.", this.$element);
       }
     }
 
-    handleTrigger () {
+    arm () {
       let trigger = this.config.trigger;
       switch (trigger) {
         case TRIGGER_CLICK:
@@ -357,7 +357,7 @@
       let $this = $(this),
           dealie = new J($this, {});
 
-      dealie.generate();
+      dealie.arm();
       dealieArray.push(dealie);
     });
   };
