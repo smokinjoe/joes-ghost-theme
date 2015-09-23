@@ -374,7 +374,7 @@
     //   dealieArray.push(dealie);
     // });
 
-    $('a').each(function () {
+    $('section.post-content').find('a').each(function () {
       let $this = $(this),
           dealie = new J($this, {});
 
