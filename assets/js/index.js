@@ -9,6 +9,7 @@
   const TRIGGER_CLICK = 'click',
       TRIGGER_HOVER = 'hover',
       TRIGGER_AUTO = 'auto',
+      TRIGGER_ONSCREEN = 'onscreen',
       TRIGGER_DEFAULT = TRIGGER_CLICK;
 
   class Ajax {
@@ -83,6 +84,11 @@
       this.config = options;
       this.$element = options.$element;
       this.$mediaContainer = $('<div />');
+
+      // clean out the config
+      if (this.config.body) {
+        $element.text(this.config.body);
+      }
     };
 
     generate () {
@@ -117,20 +123,24 @@
       }
     }
 
+    destroy () {
+      this.$mediaContainer.empty();
+    }
+
     arm () {
       let trigger = this.config.trigger;
       switch (trigger) {
         case TRIGGER_CLICK:
-          this.generate();
-          this.handleClick(this.config.$element, this.config.$mediaContainer);
+          this.handleClick();
         break;
         case TRIGGER_HOVER:
-          this.generate();
-          this.handleClick(this.config.$element, this.config.$mediaContainer);
+          this.handleHover();
+        break;
+        case TRIGGER_ONSCREEN:
+          this.showMedia();
         break;
         case TRIGGER_AUTO:
-          this.generate();
-          this.handleClick(this.config.$element, this.config.$mediaContainer);
+          this.showMedia();
         break;
       }
     }
@@ -190,7 +200,7 @@
     };
 
     handleImgur (opts) {
-      let $element = this.config.$element,
+      let $element = this.$element,
           arr = $element.data('src').split('.');
       arr.pop();
       let src = arr.join('.'),
@@ -257,8 +267,7 @@
         $video.attr('src', src);
       }
 
-      this.finishItUp($element, $video);
-      return $element;
+      this.finishItUp($video);
     };
 
     buildIMGWith (opts) {
@@ -268,7 +277,7 @@
             width: "100%"
           });
 
-      this.finishItUp($element, $img);
+      this.finishItUp($img);
     };
 
     buildiFrame (opts) {
@@ -287,48 +296,56 @@
             allowfullscreen: ''
           });
 
-      this.finishItUp($element, $iframe);
-
-      return $element;
+      this.finishItUp($iframe);
     };
 
-    finishItUp ($element, $mediaElement) {
-      if (this.config.body) {
-        $element.text(this.config.body);
-      }
-
+    finishItUp ($mediaElement) {
       this.$mediaContainer.append($mediaElement);
     };
 
     // event handlers
-    handleClick ($trigger, $ammo) {
+    handleClick () {
+      var $trigger = this.$element,
+          $ammo = this.$mediaContainer;
+
       $trigger.on('click', e => {
         e.preventDefault();
 
         if ($ammo.is(':visible')) {
+          this.destroy();
           $ammo.detach();
         }
         else {
+          this.generate();
           $ammo.appendTo($trigger);
         }
       });
     };
 
-    handleHover ($trigger, $ammo) {
+    handleHover () {
+      var $trigger = this.$element,
+          $ammo = this.$mediaContainer;
+
       $trigger.on('click', e => e.preventDefault());
       $trigger.on('mouseenter', e => {
         if (!$ammo.is(':visible')) {
+          this.generate()
           $ammo.appendTo($trigger);
         }
       });
       $trigger.on('mouseleave', e => {
         if ($ammo.is(':visible')) {
+          this.destroy();
           $ammo.detach();
         }
       });
     };
 
-    showMedia ($trigger, $ammo) {
+    showMedia () {
+      var $trigger = this.$element,
+          $ammo = this.$mediaContainer;
+
+      this.generate();
       $ammo.appendTo($trigger);
     };
 
@@ -358,6 +375,7 @@
           dealie = new J($this, {});
 
       dealie.arm();
+      //dealie.arm();
       dealieArray.push(dealie);
     });
   };
