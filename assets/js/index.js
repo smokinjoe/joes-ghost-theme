@@ -94,11 +94,9 @@
 
     generate () {
 
-      if (this.generated) {
-        return;
-      }
-      // how is this flow going to work?
-      // I guess have the click execute the generate?
+      // if (this.generated) {
+      //   return;
+      // }
 
       let config = this.config;
 
@@ -312,47 +310,47 @@
     // event handlers
     handleClick () {
       var $trigger = this.$element,
-          $ammo = this.$mediaContainer;
+          $payload = this.$mediaContainer;
 
       $trigger.on('click', e => {
         e.preventDefault();
 
-        if ($ammo.is(':visible')) {
-          // this.destroy();
-          $ammo.detach();
+        if ($payload.is(':visible')) {
+          this.destroy();
+          $payload.detach();
         }
         else {
           this.generate();
-          $ammo.appendTo($trigger);
+          $payload.appendTo($trigger);
         }
       });
     };
 
     handleHover () {
       var $trigger = this.$element,
-          $ammo = this.$mediaContainer;
+          $payload = this.$mediaContainer;
 
       $trigger.on('click', e => e.preventDefault());
       $trigger.on('mouseenter', e => {
-        if (!$ammo.is(':visible')) {
+        if (!$payload.is(':visible')) {
           this.generate()
-          $ammo.appendTo($trigger);
+          $payload.appendTo($trigger);
         }
       });
       $trigger.on('mouseleave', e => {
-        if ($ammo.is(':visible')) {
-          // this.destroy();
-          $ammo.detach();
+        if ($payload.is(':visible')) {
+          this.destroy();
+          $payload.detach();
         }
       });
     };
 
     showMedia () {
       var $trigger = this.$element,
-          $ammo = this.$mediaContainer;
+          $payload = this.$mediaContainer;
 
       this.generate();
-      $ammo.appendTo($trigger);
+      $payload.appendTo($trigger);
     };
 
   };
