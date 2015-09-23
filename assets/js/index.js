@@ -10,7 +10,11 @@
       TRIGGER_HOVER = 'hover',
       TRIGGER_AUTO = 'auto',
       TRIGGER_ONSCREEN = 'onscreen',
-      TRIGGER_DEFAULT = TRIGGER_CLICK;
+      TRIGGER_DEFAULT = TRIGGER_CLICK,
+      TRIGGER_CLICK_ICON = 'fa-hand-pointer-o',
+      TRIGGER_HOVER_ICON = 'fa-hand-paper-o',
+      TRIGGER_ONSCREEN_ICON = TRIGGER_CLICK_ICON,
+      TRIGGER_AUTO_ICON = '';
 
   class Ajax {
     static call (opts) {
@@ -356,16 +360,16 @@
       var $insert = $('<i />').addClass('fa');
       switch (this.config.trigger) {
         case TRIGGER_CLICK:
-          $insert.addClass('fa-hand-pointer-o');
+          $insert.addClass(TRIGGER_CLICK_ICON);
         break;
         case TRIGGER_HOVER:
-          $insert.addClass('fa-hand-paper-o');
+          $insert.addClass(TRIGGER_HOVER_ICON);
         break;
         case TRIGGER_ONSCREEN:
-          $insert.addClass('fa-hand-pointer-o');
+          $insert.addClass(TRIGGER_ONSCREEN_ICON);
         break;
         case TRIGGER_AUTO:
-          $insert.addClass('fa-hand-pointer-o');
+          $insert.addClass(TRIGGER_AUTO_ICON);
         break;
       }
       $insert.prependTo(this.$element);
@@ -405,7 +409,6 @@
           dealie = new J($this, {});
 
       dealie.arm();
-      //dealie.arm();
       dealieArray.push(dealie);
     });
   };
