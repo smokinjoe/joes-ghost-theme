@@ -75,11 +75,20 @@
 
       }
 
+      // trigger element
       options.$element =      $element || $("<div />");
-      options.body =          options.body || $element.text();
-      options.src =           options.src || $element.data('src') || $element.attr('href');
-      options.autoplay =      options.autoplay || false;
+      // event trigger
       options.trigger =       options.trigger || TRIGGER_DEFAULT;
+      // message
+      options.body =          options.body || $element.text();
+      // source of media
+      options.src =           options.src || $element.data('src') || $element.attr('href');
+
+      // media options
+      options.autoplay =      options.autoplay || false;
+      options.muted =         options.muted === "false" ? undefined : false;
+      options.loop =          options.loop || false;
+      options.preload =       options.preload || false;
 
       this.config = options;
       this.$element = options.$element;
@@ -231,19 +240,16 @@
           width = opts.width || '100%',
           $element = opts.$element || $('<div />'),
           src = opts.src || $element.data('src'),
-          autoplay = opts.autoplay,
-          //webmSrc = opts.webmSrc || (src + '.webm'),
-          //mp4Src = opts.mp4Src || (src + '.mp4'),
           webmSrc = opts.webmSrc || false,
           mp4Src = opts.mp4Src || false,
           wrapChildSources = opts.wrapChildSources || false,
           $video = $('<video>', {
             height: height,
             width: width,
-            loop: '',
-            autoplay: autoplay,
+            loop: this.config.loop,
+            autoplay: this.config.autoplay,
             controls: '',
-            muted: 'muted'
+            muted: this.config.muted
           }),
           webmID = opts.webmID || 'webmsource',
           mp4ID = opts.mp4ID || 'mp4source',
