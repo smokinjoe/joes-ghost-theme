@@ -124,11 +124,11 @@
       else {
         console.log("JOE: Link doesn't have fun media.");
       }
-    }
+    };
 
     destroy () {
       this.$mediaContainer.empty();
-    }
+    };
 
     arm () {
       let trigger = this.config.trigger;
@@ -146,6 +146,7 @@
           this.showMedia();
         break;
       }
+      this.displayTrigger();
     }
 
     // Various handlers
@@ -343,6 +344,25 @@
           $payload.detach();
         }
       });
+    };
+
+    displayTrigger () {
+      var $insert = $('<i />').addClass('fa');
+      switch (this.config.trigger) {
+        case TRIGGER_CLICK:
+          $insert.addClass('fa-hand-pointer-o');
+        break;
+        case TRIGGER_HOVER:
+          $insert.addClass('fa-hand-paper-o');
+        break;
+        case TRIGGER_ONSCREEN:
+          $insert.addClass('fa-hand-pointer-o');
+        break;
+        case TRIGGER_AUTO:
+          $insert.addClass('fa-hand-pointer-o');
+        break;
+      }
+      $insert.prependTo(this.$element);
     };
 
     showMedia () {
