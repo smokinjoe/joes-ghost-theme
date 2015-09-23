@@ -16,6 +16,12 @@
       TRIGGER_ONSCREEN_ICON = TRIGGER_CLICK_ICON,
       TRIGGER_AUTO_ICON = '';
 
+  const VIDEO_OPTIONS_DEFAULT_AUTOPLAY = false,
+        VIDEO_OPTIONS_DEFAULT_MUTED_TRUE = undefined,
+        VIDEO_OPTIONS_DEFAULT_MUTED_FALSE = false,
+        VIDEO_OPTIONS_DEFAULT_LOOP = false,
+        VIDEO_OPTIONS_DEFAULT_PRELOAD = false;
+
   class Ajax {
     static call (opts) {
       opts = opts || {};
@@ -89,10 +95,10 @@
       options.src =           options.src || $element.data('src') || $element.attr('href');
 
       // media options
-      options.autoplay =      options.autoplay || false;
-      options.muted =         options.muted === "false" ? undefined : false;
-      options.loop =          options.loop || false;
-      options.preload =       options.preload || false;
+      options.autoplay =      options.autoplay || VIDEO_OPTIONS_DEFAULT_AUTOPLAY;
+      options.muted =         options.muted === "false" ? VIDEO_OPTIONS_DEFAULT_MUTED_TRUE : VIDEO_OPTIONS_DEFAULT_MUTED_FALSE;
+      options.loop =          options.loop || VIDEO_OPTIONS_DEFAULT_LOOP;
+      options.preload =       options.preload || VIDEO_OPTIONS_DEFAULT_PRELOAD;
 
       this.config = options;
       this.$element = options.$element;
