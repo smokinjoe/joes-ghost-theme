@@ -84,6 +84,7 @@
       this.config = options;
       this.$element = options.$element;
       this.$mediaContainer = $('<div />');
+      this.generated = false;
 
       // clean out the config
       if (this.config.body) {
@@ -92,6 +93,10 @@
     };
 
     generate () {
+
+      if (this.generated) {
+        return;
+      }
       // how is this flow going to work?
       // I guess have the click execute the generate?
 
@@ -301,6 +306,7 @@
 
     finishItUp ($mediaElement) {
       this.$mediaContainer.append($mediaElement);
+      this.generated = true;
     };
 
     // event handlers
@@ -312,7 +318,7 @@
         e.preventDefault();
 
         if ($ammo.is(':visible')) {
-          this.destroy();
+          // this.destroy();
           $ammo.detach();
         }
         else {
@@ -335,7 +341,7 @@
       });
       $trigger.on('mouseleave', e => {
         if ($ammo.is(':visible')) {
-          this.destroy();
+          // this.destroy();
           $ammo.detach();
         }
       });
