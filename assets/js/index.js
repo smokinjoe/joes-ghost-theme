@@ -113,7 +113,7 @@
         this.handleYouTube(config);
       }
       else {
-        console.log("JOE: Link doesn't have fun media.", this.$element);
+        console.log("JOE: Link doesn't have fun media.");
       }
     }
 
