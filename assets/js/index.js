@@ -218,7 +218,7 @@
 
     handleImgur (opts) {
       let $element = this.$element,
-          arr = $element.data('src').split('.');
+          arr = this.config.src.split('.');
       arr.pop();
       let src = arr.join('.'),
           webmSrc = src + '.webm',
