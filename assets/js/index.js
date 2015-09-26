@@ -71,14 +71,14 @@
     static log (arg) {
       if (arguments.length > 1) {
         if (typeof arg === "string") {
-          console.log("1 JOE: " + arguments[0] + ": ", this.rest(arguments[1]));
+          console.log("JOE: " + arguments[0] + ": ", this.rest(arguments[1]));
         }
         else {
-          console.log("2 JOE: arguments", this.rest(arguments));
+          console.log("JOE: arguments", this.rest(arguments));
         }
       }
       else {
-        console.log("3 JOE: ", arg);
+        console.log("JOE: ", arg);
       }
     };
   };
