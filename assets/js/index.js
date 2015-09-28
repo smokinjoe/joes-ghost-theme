@@ -45,7 +45,7 @@
     },
     {
       title: "I Am The Captain Now",
-      regex: "captain"
+      regex: ["captain", "capm"]
     }
   ];
 
@@ -427,29 +427,43 @@
 
   };
 
-  class Interpolate {
-    constructor (text, callback) {
+  class I {
+    static t (text, callback) {
       TERMS.forEach((term, index) => {
         var regexString = term.regex,
             regex = new RegExp(regexString, "g"),
-            a = term.options && term.options.src ? 
-                  '<a href="' + term.options.src + '"'
-                  + " data-inline='{ \"trigger\": \"hover\" }'>"
-                  + term.title
-                  + '</a>' :
-                  term.title;
+            a = this.buildElement(term);
         
         text = text.replace(regex, a);
       });
 
       callback(text);
     };
-  }
+
+    static buildElement (term) {
+      return term.options && term.options.src ?
+        this.link(term) :
+        this.text(term);
+    };
+
+    static link (term) {
+      return '<a href="' + term.options.src + '"'
+                  + " data-inline='{ \"trigger\": \"" + term.options.trigger + "\" }'>"
+                  + term.title
+                  + '</a>';
+    };
+
+    static text (term) {
+      return term.title;
+    };
+
+  };
+
   var $document = $(document),
       dealieArray = [];
 
   $document.ready(function () {
-    new Interpolate($('section.post-content').html(), (html) => {
+    new I.t($('section.post-content').html(), (html) => {
       $('section.post-content').html(html);
       checkInlineMedia();
     });
