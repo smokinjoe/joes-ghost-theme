@@ -22,6 +22,33 @@
         VIDEO_OPTIONS_DEFAULT_LOOP = false,
         VIDEO_OPTIONS_DEFAULT_PRELOAD = false;
 
+  // regex: /<[^@@]*>/,
+  // r: 'butt'
+
+  // /\bjest\b/g
+  const TERMS = [
+    {
+      title: 'jest',
+      regex: '@jest@',
+      options: {
+        src: 'http://i.imgur.com/QFvh8Ja.jpg',
+        trigger: TRIGGER_HOVER
+      }
+    },
+    {
+      title: 'lolts',
+      regex: '@lolts@',
+      options: {
+        src: 'http://i.imgur.com/an43DvG.png',
+        trigger: TRIGGER_HOVER
+      }
+    },
+    {
+      title: "I Am The Captain Now",
+      regex: "captain"
+    }
+  ];
+
   class Ajax {
     static call (opts) {
       opts = opts || {};
@@ -401,29 +428,36 @@
   };
 
   class Interpolate {
-    constructor () {
-      
-    }
+    constructor (text, callback) {
+      TERMS.forEach((term, index) => {
+        var regexString = term.regex,
+            regex = new RegExp(regexString, "g"),
+            a = term.options && term.options.src ? 
+                  '<a href="' + term.options.src + '"'
+                  + " data-inline='{ \"trigger\": \"hover\" }'>"
+                  + term.title
+                  + '</a>' :
+                  term.title;
+        
+        text = text.replace(regex, a);
+      });
+
+      callback(text);
+    };
   }
   var $document = $(document),
       dealieArray = [];
 
   $document.ready(function () {
-    checkInlineMedia();
+    new Interpolate($('section.post-content').html(), (html) => {
+      $('section.post-content').html(html);
+      checkInlineMedia();
+    });
+
     setArcticScroll();
   });
 
   var checkInlineMedia = function () {
-    // $('a[data-inline]').each(function () {
-    //   var $this = $(this),
-    //       src = $this.data('src'),
-    //       dealie = new J({
-    //         $element: $this
-    //       });
-
-    //   dealieArray.push(dealie);
-    // });
-
     $('section.post-content').find('a').each(function () {
       let $this = $(this),
           dealie = new J($this, {});
