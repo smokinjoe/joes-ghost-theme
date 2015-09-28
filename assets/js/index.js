@@ -10,7 +10,17 @@
       TRIGGER_HOVER = 'hover',
       TRIGGER_AUTO = 'auto',
       TRIGGER_ONSCREEN = 'onscreen',
-      TRIGGER_DEFAULT = TRIGGER_CLICK;
+      TRIGGER_DEFAULT = TRIGGER_CLICK,
+      TRIGGER_CLICK_ICON = 'fa-hand-pointer-o',
+      TRIGGER_HOVER_ICON = 'fa-hand-paper-o',
+      TRIGGER_ONSCREEN_ICON = TRIGGER_CLICK_ICON,
+      TRIGGER_AUTO_ICON = '';
+
+  const VIDEO_OPTIONS_DEFAULT_AUTOPLAY = false,
+        VIDEO_OPTIONS_DEFAULT_MUTED_TRUE = undefined,
+        VIDEO_OPTIONS_DEFAULT_MUTED_FALSE = false,
+        VIDEO_OPTIONS_DEFAULT_LOOP = false,
+        VIDEO_OPTIONS_DEFAULT_PRELOAD = false;
 
   class Ajax {
     static call (opts) {
@@ -58,6 +68,19 @@
       extender = extender || {};
       return jQuery.extend(true, extender, thing);
     };
+    static log (arg) {
+      if (arguments.length > 1) {
+        if (typeof arg === "string") {
+          console.log("JOE: " + arguments[0] + ": ", this.rest(arguments[1]));
+        }
+        else {
+          console.log("JOE: arguments", this.rest(arguments));
+        }
+      }
+      else {
+        console.log("JOE: ", arg);
+      }
+    };
   };
 
   class J {
@@ -75,11 +98,20 @@
 
       }
 
+      // trigger element
       options.$element =      $element || $("<div />");
-      options.body =          options.body || $element.text();
-      options.src =           options.src || $element.data('src') || $element.attr('href');
-      options.autoplay =      options.autoplay || false;
+      // event trigger
       options.trigger =       options.trigger || TRIGGER_DEFAULT;
+      // message
+      options.body =          options.body || $element.text();
+      // source of media
+      options.src =           options.src || $element.data('src') || $element.attr('href');
+
+      // media options
+      options.autoplay =      options.autoplay || VIDEO_OPTIONS_DEFAULT_AUTOPLAY;
+      options.muted =         options.muted === "false" ? VIDEO_OPTIONS_DEFAULT_MUTED_TRUE : VIDEO_OPTIONS_DEFAULT_MUTED_FALSE;
+      options.loop =          options.loop || VIDEO_OPTIONS_DEFAULT_LOOP;
+      options.preload =       options.preload || VIDEO_OPTIONS_DEFAULT_PRELOAD;
 
       this.config = options;
       this.$element = options.$element;
@@ -205,7 +237,7 @@
 
     handleImgur (opts) {
       let $element = this.$element,
-          arr = $element.data('src').split('.');
+          arr = this.config.src.split('.');
       arr.pop();
       let src = arr.join('.'),
           webmSrc = src + '.webm',
@@ -231,19 +263,16 @@
           width = opts.width || '100%',
           $element = opts.$element || $('<div />'),
           src = opts.src || $element.data('src'),
-          autoplay = opts.autoplay,
-          //webmSrc = opts.webmSrc || (src + '.webm'),
-          //mp4Src = opts.mp4Src || (src + '.mp4'),
           webmSrc = opts.webmSrc || false,
           mp4Src = opts.mp4Src || false,
           wrapChildSources = opts.wrapChildSources || false,
           $video = $('<video>', {
             height: height,
             width: width,
-            loop: '',
-            autoplay: autoplay,
+            loop: this.config.loop,
+            autoplay: this.config.autoplay,
             controls: '',
-            muted: 'muted'
+            muted: this.config.muted
           }),
           webmID = opts.webmID || 'webmsource',
           mp4ID = opts.mp4ID || 'mp4source',
@@ -350,16 +379,16 @@
       var $insert = $('<i />').addClass('fa');
       switch (this.config.trigger) {
         case TRIGGER_CLICK:
-          $insert.addClass('fa-hand-pointer-o');
+          $insert.addClass(TRIGGER_CLICK_ICON);
         break;
         case TRIGGER_HOVER:
-          $insert.addClass('fa-hand-paper-o');
+          $insert.addClass(TRIGGER_HOVER_ICON);
         break;
         case TRIGGER_ONSCREEN:
-          $insert.addClass('fa-hand-pointer-o');
+          $insert.addClass(TRIGGER_ONSCREEN_ICON);
         break;
         case TRIGGER_AUTO:
-          $insert.addClass('fa-hand-pointer-o');
+          $insert.addClass(TRIGGER_AUTO_ICON);
         break;
       }
       $insert.prependTo(this.$element);
@@ -399,7 +428,6 @@
           dealie = new J($this, {});
 
       dealie.arm();
-      //dealie.arm();
       dealieArray.push(dealie);
     });
   };
