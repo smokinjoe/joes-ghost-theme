@@ -400,6 +400,11 @@
 
   };
 
+  class Interpolate {
+    constructor () {
+      
+    }
+  }
   var $document = $(document),
       dealieArray = [];
 
