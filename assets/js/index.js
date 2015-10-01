@@ -45,7 +45,15 @@
     },
     {
       title: "I Am The Captain Now",
-      regex: ["captain", "capm"]
+      regex: ["captain", "capm", "cap", "matts"]
+    },
+    {
+      title: "Flip Flops & Coronas",
+      regex: ["flips", "ffs", "epon"]
+    },
+    {
+      title: "#FreeBrady",
+      regex: ["tim", "fb"]
     }
   ];
 
