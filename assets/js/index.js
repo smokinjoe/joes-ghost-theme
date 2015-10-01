@@ -22,6 +22,41 @@
         VIDEO_OPTIONS_DEFAULT_LOOP = false,
         VIDEO_OPTIONS_DEFAULT_PRELOAD = false;
 
+  // regex: /<[^@@]*>/,
+  // r: 'butt'
+
+  // /\bjest\b/g
+  const TERMS = [
+    {
+      title: 'jest',
+      regex: '@jest@',
+      options: {
+        src: 'http://i.imgur.com/QFvh8Ja.jpg',
+        trigger: TRIGGER_HOVER
+      }
+    },
+    {
+      title: 'lolts',
+      regex: '@lolts@',
+      options: {
+        src: 'http://i.imgur.com/an43DvG.png',
+        trigger: TRIGGER_HOVER
+      }
+    },
+    {
+      title: "I Am The Captain Now",
+      regex: ["captain", "capm", "cap", "matts"]
+    },
+    {
+      title: "Flip Flops & Coronas",
+      regex: ["flips", "ffs", "epon"]
+    },
+    {
+      title: "#FreeBrady",
+      regex: ["tim", "fb"]
+    }
+  ];
+
   class Ajax {
     static call (opts) {
       opts = opts || {};
@@ -407,25 +442,51 @@
 
   };
 
+  class I {
+    static t (text, callback) {
+      TERMS.forEach((term, index) => {
+        var regexString = typeof term.regex === "string" ? term.regex : term.regex.join('|'),
+            regex = new RegExp(regexString, "g"),
+            a = this.buildElement(term);
+
+        text = text.replace(regex, a);
+      });
+
+      callback(text);
+    };
+
+    static buildElement (term) {
+      return term.options && term.options.src ?
+        this.link(term) :
+        this.text(term);
+    };
+
+    static link (term) {
+      return '<a href="' + term.options.src + '"'
+                  + " data-inline='{ \"trigger\": \"" + term.options.trigger + "\" }'>"
+                  + term.title
+                  + '</a>';
+    };
+
+    static text (term) {
+      return term.title;
+    };
+
+  };
+
   var $document = $(document),
       dealieArray = [];
 
   $document.ready(function () {
-    checkInlineMedia();
+    I.t($('section.post-content').html(), function (html) {
+      $('section.post-content').html(html);
+      checkInlineMedia();
+    });
+
     setArcticScroll();
   });
 
   var checkInlineMedia = function () {
-    // $('a[data-inline]').each(function () {
-    //   var $this = $(this),
-    //       src = $this.data('src'),
-    //       dealie = new J({
-    //         $element: $this
-    //       });
-
-    //   dealieArray.push(dealie);
-    // });
-
     $('section.post-content').find('a').each(function () {
       let $this = $(this),
           dealie = new J($this, {});
