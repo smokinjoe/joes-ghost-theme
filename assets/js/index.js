@@ -162,23 +162,30 @@
       this.$mediaContainer.empty();
     };
 
+    isValidMedia () {
+      var regex = /streamable|mp4|gfycat|gifv|gif|jpg|jpeg|png|youtube/;
+      return this.config.src.match(regex);
+    };
+
     arm () {
-      let trigger = this.config.trigger;
-      switch (trigger) {
-        case TRIGGER_CLICK:
-          this.handleClick();
-        break;
-        case TRIGGER_HOVER:
-          this.handleHover();
-        break;
-        case TRIGGER_ONSCREEN:
-          this.showMedia();
-        break;
-        case TRIGGER_AUTO:
-          this.showMedia();
-        break;
+      if (this.isValidMedia()) {
+        let trigger = this.config.trigger;
+        switch (trigger) {
+          case TRIGGER_CLICK:
+            this.handleClick();
+          break;
+          case TRIGGER_HOVER:
+            this.handleHover();
+          break;
+          case TRIGGER_ONSCREEN:
+            this.showMedia();
+          break;
+          case TRIGGER_AUTO:
+            this.showMedia();
+          break;
+        }
+        this.displayTrigger();
       }
-      this.displayTrigger();
     }
 
     // Various handlers
