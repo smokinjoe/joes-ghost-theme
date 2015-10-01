@@ -162,34 +162,40 @@
       this.$mediaContainer.empty();
     };
 
+    isValidMedia () {
+      var regex = /streamable|mp4|gfycat|gifv|gif|jpg|jpeg|png|youtube/;
+      return this.config.src.match(regex);
+    };
+
     arm () {
-      let trigger = this.config.trigger;
-      switch (trigger) {
-        case TRIGGER_CLICK:
-          this.handleClick();
-        break;
-        case TRIGGER_HOVER:
-          this.handleHover();
-        break;
-        case TRIGGER_ONSCREEN:
-          this.showMedia();
-        break;
-        case TRIGGER_AUTO:
-          this.showMedia();
-        break;
+      if (this.isValidMedia()) {
+        let trigger = this.config.trigger;
+        switch (trigger) {
+          case TRIGGER_CLICK:
+            this.handleClick();
+          break;
+          case TRIGGER_HOVER:
+            this.handleHover();
+          break;
+          case TRIGGER_ONSCREEN:
+            this.showMedia();
+          break;
+          case TRIGGER_AUTO:
+            this.showMedia();
+          break;
+        }
+        this.displayTrigger();
       }
-      this.displayTrigger();
     }
 
     // Various handlers
     handleStreamableMedia () {
       let uriArray = this.config.src.split('/'),
           streamableId = uriArray[uriArray.length - 1],
-          src = '//streamable.com/res/' + streamableId,
-          $element = this.$element;
+          src = '//streamable.com/res/' + streamableId;
 
       this.buildiFrame({
-        $element: $element,
+        $element: this.$element,
         width: '100%',
         src: src,
         scrolling: 'no'
@@ -199,7 +205,6 @@
     handleGfyCat () {
       let uriArray = this.config.src.split('/'),
           gfyCatDealie = uriArray[uriArray.length - 1],
-          $element = this.$element,
           that = this,
           webmSrc, mp4Src;
 
@@ -210,7 +215,7 @@
           webmSrc = response.gfyItem.webmUrl;
           mp4Src = response.gfyItem.mp4Url;
           that.buildHTML5Video({
-            $element: $element,
+            $element: this.$element,
             wrapChildSources: true,
             webmSrc: webmSrc,
             mp4Src: mp4Src
@@ -226,25 +231,23 @@
     handleYouTube () {
       let src = this.config.src,
           result = Ajax.parser(src),
-          ytKey = result.search.split('=')[1],
-          $element = this.$element;
+          ytKey = result.search.split('=')[1];
 
       this.buildiFrame({
-        $element: $element,
+        $element: this.$element,
         src: '//youtube.com/embed/' + ytKey
       });
     };
 
     handleImgur (opts) {
-      let $element = this.$element,
-          arr = this.config.src.split('.');
+      var arr = this.config.src.split('.');
       arr.pop();
       let src = arr.join('.'),
           webmSrc = src + '.webm',
           mp4Src = src + '.mp4';
 
       this.buildHTML5Video({
-        $element: $element,
+        $element: this.$element,
         wrapChildSources: true,
         webmSrc: webmSrc,
         mp4Src: mp4Src
