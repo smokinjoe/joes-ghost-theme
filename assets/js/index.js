@@ -430,10 +430,10 @@
   class I {
     static t (text, callback) {
       TERMS.forEach((term, index) => {
-        var regexString = term.regex,
+        var regexString = typeof term.regex === "string" ? term.regex : term.regex.join('|'),
             regex = new RegExp(regexString, "g"),
             a = this.buildElement(term);
-        
+
         text = text.replace(regex, a);
       });
 
@@ -463,7 +463,7 @@
       dealieArray = [];
 
   $document.ready(function () {
-    new I.t($('section.post-content').html(), (html) => {
+    I.t($('section.post-content').html(), function (html) {
       $('section.post-content').html(html);
       checkInlineMedia();
     });
